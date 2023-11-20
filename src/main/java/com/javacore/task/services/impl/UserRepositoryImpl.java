@@ -62,9 +62,8 @@ public class UserRepositoryImpl implements UserRepository {
     public List<User> findAll() {
         Map<Long, Object> userStorage = inMemoryStorage.getEntityStorage("User");
         if (userStorage != null) {
-            return new ArrayList<>(userStorage.values().stream()
-                    .map(entity -> (User) entity)
-                    .collect(Collectors.toList()));
+            return userStorage.values().stream()
+                    .map(entity -> (User) entity).collect(Collectors.toList());
         }
         return Collections.emptyList();
     }

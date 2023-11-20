@@ -58,7 +58,7 @@ public class InMemoryStorage {
             }
         } catch (StorageException | JsonProcessingException e) {
             e.printStackTrace();
-            log.error("Could not parse json {} with user tpye {}", parts[2], parts[0]);
+            log.error("Could not parse json {} with user type {} due to {}", parts[2], parts[0], e.getMessage());
         }
     }
 

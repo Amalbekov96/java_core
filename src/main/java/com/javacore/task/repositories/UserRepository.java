@@ -8,7 +8,7 @@ import java.util.List;
 public interface UserRepository {
     User findById(Long id);
 
-    User save(User user) throws StorageException, StorageException;
+    User save(User user) throws StorageException;
 
     void deleteById(Long id);
 
