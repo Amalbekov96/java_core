@@ -8,6 +8,7 @@ import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.models.TraineeModel;
 import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.services.TraineeService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

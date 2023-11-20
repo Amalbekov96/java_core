@@ -12,4 +12,5 @@ public class TrainingModel {
     private String trainingName;
     private Date trainingDate;
     private int trainingDuration;
+    TrainingTypeModel trainingTypeModel;
 }

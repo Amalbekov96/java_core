@@ -47,7 +47,7 @@ public class TrainingServiceImpl implements TrainingService {
         try {
             Training existingTraining = trainingRepository.findById(trainingId);
             if(existingTraining == null) {
-                   new ApiException("Training with ID " + trainingId + " not found", ErrorCode.TRAINING_NOT_FOUND);
+                throw new ApiException("Training with ID " + trainingId + " not found", ErrorCode.TRAINING_NOT_FOUND);
             }
             trainingMapper.update(trainingModel, existingTraining);
             existingTraining = trainingRepository.save(existingTraining);

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
+import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.StorageException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class InMemoryStorage {
 
     private final ObjectMapper objectMapper;
 
-    private final Map<String, Map<Long, Object>> entityStorage = new HashMap<>();
+    private static final Map<String, Map<Long, Object>> entityStorage = new HashMap<>();
 
     @Value("${data.file.path}")
     private String dataFilePath;
@@ -52,25 +53,23 @@ public class InMemoryStorage {
                 String entityNamespace = parts[0];
                 Long id = Long.parseLong(parts[1]);
                 // Deserialize the entity based on the actual structure
-                Object entity = deserializeEntity(entityNamespace,parts[2]);
+                Object entity = deserializeEntity(entityNamespace, parts[2]);
                 entityStorage.computeIfAbsent(entityNamespace, k -> new HashMap<>()).put(id, entity);
             }
         } catch (StorageException | JsonProcessingException e) {
+            e.printStackTrace();
             log.error("Could not parse json {} with user tpye {}", parts[2], parts[0]);
         }
     }
 
     private Object deserializeEntity(String entityNamespace, String serializedEntity) throws StorageException, JsonProcessingException {
-        switch (entityNamespace){
-            case "Trainer":
-                return objectMapper.readValue(serializedEntity, Trainer.class);
-            case "Trainee":
-                return objectMapper.readValue(serializedEntity, Trainee.class);
-            case "Training":
-                return objectMapper.readValue(serializedEntity, Training.class);
-            default:
-                throw new StorageException("There is no type " + entityNamespace);
-        }
+        return switch (entityNamespace) {
+            case "Trainer" -> objectMapper.readValue(serializedEntity, Trainer.class);
+            case "Trainee" -> objectMapper.readValue(serializedEntity, Trainee.class);
+            case "Training" -> objectMapper.readValue(serializedEntity, Training.class);
+            case "User" -> objectMapper.readValue(serializedEntity, User.class);
+            default -> throw new StorageException("There is no type " + entityNamespace);
+        };
     }
 
     public Map<Long, Object> getEntityStorageByNamespace(String namespace) {
@@ -108,5 +107,29 @@ public class InMemoryStorage {
         } catch (StorageException | JsonProcessingException e) {
             log.error("Could not parse json {} with user type {}", parts[2], parts[0]);
         }
+    }
+
+    public boolean usernameExists(String username, String userType) {
+        Map<Long, Object> storage;
+        storage = entityStorage.get(userType);
+
+        if (storage != null && !storage.isEmpty()) {
+            for (Object entity : storage.values()) {
+                if (entity instanceof Trainer trainer) {
+                    if (username.equals(trainer.getUser().getUsername())) {
+                        return true;
+                    }
+                } else if (entity instanceof Trainee trainee) {
+                    if (username.equals(trainee.getUser().getUsername())) {
+                        return true;
+                    }
+                } else if (entity instanceof User user) {
+                    if (username.equalsIgnoreCase(user.getUsername())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
     }
 }
