@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//@Entity
-//@Table(name = "TRAINER")
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -22,6 +21,6 @@ public class Trainer {
     private TrainingType specialization;
 
     @OneToOne
-    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
+    @JoinColumn(name = "\"USER_ID\"", referencedColumnName = "\"USER_ID\"")
     private User user;
 }

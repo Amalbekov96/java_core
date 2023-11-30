@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-//@Entity
-//@Table(name = "TRAINING_TYPE")
+@Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

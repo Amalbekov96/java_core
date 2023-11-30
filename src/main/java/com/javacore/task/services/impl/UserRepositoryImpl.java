@@ -5,35 +5,32 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.javacore.task.configs.InMemoryStorage;
 import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.StorageException;
-import com.javacore.task.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl{
 
     private final InMemoryStorage inMemoryStorage;
     private final ObjectMapper objectMapper;
 
-    @Override
-    public User findById(Long id) {
+    public Optional<User> findById(Long id) {
         Map<Long, Object> userStorage = inMemoryStorage.getEntityStorage("User");
         if (userStorage != null) {
-            return (User) userStorage.get(id);
+            return (Optional<User>) userStorage.get(id);
         }
         return null;
     }
 
-    @Override
     public User save(User user) throws StorageException {
         if (user.getUserId() == null) {
             // Calculate the next ID
@@ -50,7 +47,6 @@ public class UserRepositoryImpl implements UserRepository {
         return user;
     }
 
-    @Override
     public void deleteById(Long id) {
         Map<Long, Object> userStorage = inMemoryStorage.getEntityStorage("User");
         if (userStorage != null) {
@@ -58,7 +54,6 @@ public class UserRepositoryImpl implements UserRepository {
         }
     }
 
-    @Override
     public List<User> findAll() {
         Map<Long, Object> userStorage = inMemoryStorage.getEntityStorage("User");
         if (userStorage != null) {

@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public enum UserType {
+public enum UserRole {
     TRAINER("Trainer"),
     TRAINEE("Trainee"),
     TRAINING("Training"),
