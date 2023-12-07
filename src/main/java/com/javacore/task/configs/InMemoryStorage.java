@@ -2,10 +2,7 @@ package com.javacore.task.configs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javacore.task.entities.Trainee;
-import com.javacore.task.entities.Trainer;
-import com.javacore.task.entities.Training;
-import com.javacore.task.entities.User;
+import com.javacore.task.entities.*;
 import com.javacore.task.exceptions.StorageException;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,6 +19,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -42,7 +44,8 @@ public class InMemoryStorage {
             lines.forEach(this::addEntity);
         }
 
-        System.out.println(entityStorage);
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::updateFileContent, 0, 2, TimeUnit.MINUTES);
     }
 
     public void addEntity(String entityData) {
@@ -68,6 +71,7 @@ public class InMemoryStorage {
             case "Trainee" -> objectMapper.readValue(serializedEntity, Trainee.class);
             case "Training" -> objectMapper.readValue(serializedEntity, Training.class);
             case "User" -> objectMapper.readValue(serializedEntity, User.class);
+            case "TrainingType" -> objectMapper.readValue(serializedEntity, TrainingType.class);
             default -> throw new StorageException("There is no type " + entityNamespace);
         };
     }
@@ -131,5 +135,24 @@ public class InMemoryStorage {
             }
         }
         return false;
+    }
+
+    private void updateFileContent() {
+        log.info("START updating the  file content");
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dataFilePath))) {
+            // Iterate through the entityStorage map and write each entry to the file
+            for (Map.Entry<String, Map<Long, Object>> entry : entityStorage.entrySet()) {
+                for (Map.Entry<Long, Object> innerEntry : entry.getValue().entrySet()) {
+                    String line = entry.getKey() + "|" + innerEntry.getKey() + "|" +
+                            objectMapper.writeValueAsString(innerEntry.getValue());
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+            log.info("FINISH updating the  file content");
+        } catch (IOException e) {
+            log.warn(e.getMessage());
+            e.printStackTrace();
+        }
     }
 }

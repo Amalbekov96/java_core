@@ -20,10 +20,12 @@ public class ProfileServiceImpl implements ProfileService {
         String username = baseUsername;
 
         // Check if the username already exists
-        int serialNumber = 1;
-        while (inMemoryStorage.usernameExists(username, userType)) {
-            username = baseUsername + serialNumber;
-            serialNumber++;
+        if(inMemoryStorage != null) {
+            int serialNumber = 1;
+            while (inMemoryStorage.usernameExists(username, userType)) {
+                username = baseUsername + serialNumber;
+                serialNumber++;
+            }
         }
 
         return username;
