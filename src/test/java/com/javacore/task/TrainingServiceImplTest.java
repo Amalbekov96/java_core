@@ -19,7 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
@@ -74,17 +74,25 @@ class TrainingServiceImplTest {
     @Test
     void createTraining_withValidData_shouldReturnTrainingModel() throws StorageException {
         // Arrange
+        // Create real TraineeModel
+        TraineeModel traineeModel = new TraineeModel();
+        traineeModel.setTraineeId(1L); // Set appropriate values
+
+        // Create real TrainerModel
+        TrainerModel trainerModel = new TrainerModel();
+        trainerModel.setId(1L); // Set appropriate values
+
         TrainingModel trainingModel = new TrainingModel();
-        trainingModel.setTrainee(new TraineeModel());
-        trainingModel.setTrainer(new TrainerModel());
+        trainingModel.setTrainee(traineeModel);
+        trainingModel.setTrainer(trainerModel);
         Training trainingEntity = new Training();
 
-        // Adjust the stub to return a valid TrainerModel
-        when(trainerService.getTrainerById(any()))
-                .thenReturn(new TrainerModel()); // You may need to create a valid TrainerModel with necessary data
+        // Set up stubs
+        when(trainerService.getTrainerById(eq(trainerModel.getId())))
+                .thenReturn(trainerModel);
 
-        when(traineeService.getTraineeById(any()))
-                .thenReturn(new TraineeModel());
+        when(traineeService.getTraineeById(eq(traineeModel.getTraineeId())))
+                .thenReturn(traineeModel);
 
         when(trainingMapper.trainingModelToTraining(trainingModel)).thenReturn(trainingEntity);
         when(trainingRepository.save(trainingEntity)).thenReturn(trainingEntity);
@@ -96,6 +104,7 @@ class TrainingServiceImplTest {
         // Assert
         assertEquals(trainingModel, result);
     }
+
 
     @Test
     void createTraining_withMissingTrainer_shouldThrowApiException() {

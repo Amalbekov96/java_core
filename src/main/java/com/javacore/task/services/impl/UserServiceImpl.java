@@ -53,7 +53,7 @@ public class UserServiceImpl implements UserService {
     public UserModel updateUser(Long userId, UserModel userModel) {
         try {
             User existingUser = userRepository.findById(userId);
-            if (existingUser != null) {
+            if (existingUser == null) {
                 throw new ApiException("User with ID " + userId + " not found", ErrorCode.USER_NOT_FOUND);
             }
 

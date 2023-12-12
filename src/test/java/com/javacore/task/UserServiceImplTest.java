@@ -1,99 +1,149 @@
 package com.javacore.task;
 
 import com.javacore.task.entities.User;
-import com.javacore.task.enums.UserType;
+import com.javacore.task.exceptions.ApiException;
 import com.javacore.task.exceptions.StorageException;
 import com.javacore.task.mappers.UserMapper;
 import com.javacore.task.models.UserModel;
 import com.javacore.task.repositories.UserRepository;
-import com.javacore.task.services.impl.ProfileServiceImpl;
+import com.javacore.task.services.ProfileService;
 import com.javacore.task.services.impl.UserServiceImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.EmptyResultDataAccessException;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
+
     @InjectMocks
     private UserServiceImpl userService;
 
     @Mock
-    private ProfileServiceImpl profileService;
+    private UserRepository userRepository;
 
     @Mock
-    UserRepository userRepository;
+    private ProfileService profileService;
 
     @Mock
-    UserMapper userMapper;
-
+    private UserMapper userMapper;
     @Test
-    public void testGetUserById_UserFound() {
-        // Mock data
+    void getUserById_withValidId_shouldReturnUserModel() {
+        // Arrange
         Long userId = 1L;
         User userEntity = new User();
         userEntity.setUserId(userId);
-        userEntity.setFirstName("John");
-        userEntity.setLastName("Doe");
-        userEntity.setUsername("john.doe");
-        userEntity.setPassword("password123");
-        userEntity.setIsActive(true);
-
         UserModel userModel = new UserModel();
         userModel.setUserId(userId);
-        userModel.setFirstName("John");
-        userModel.setLastName("Doe");
-        userModel.setUsername("john.doe");
-        userModel.setPassword("password123");
-        userModel.setIsActive(true);
 
-        // Mock userRepository.findById
-        Mockito.when(userRepository.findById(userId)).thenReturn(userEntity);
+        when(userRepository.findById(userId)).thenReturn(userEntity);
+        when(userMapper.userToUserModel(userEntity)).thenReturn(userModel);
 
-        // Mock userMapper.userToUserModel
-        Mockito.when(userMapper.userToUserModel(userEntity)).thenReturn(userModel);
-
-        // Perform the tesJohnt
+        // Act
         UserModel result = userService.getUserById(userId);
 
-        // Verify the result
-        Assertions.assertEquals(userModel, result);
+        // Assert
+        assertEquals(userModel, result);
     }
 
     @Test
-    public void testCreateUser_Success() throws StorageException {
-        // Mock data
+    void getUserById_withInvalidId_shouldThrowApiException() {
+        // Arrange
+        Long userId = 1L;
+
+        // Make the stubbing lenient
+        lenient().when(userRepository.findById(userId)).thenReturn(null);
+        // Act and Assert
+        assertThrows(ApiException.class, () -> userService.getUserById(userId));
+    }
+
+    @Test
+    void createUser_withValidData_shouldReturnUserModel() throws StorageException {
+        // Arrange
         UserModel userModel = new UserModel();
-        userModel.setFirstName("John");
-        userModel.setLastName("Doe");
-
         User userEntity = new User();
-        userEntity.setUserId(1L);
-        userEntity.setFirstName("John");
-        userEntity.setLastName("Doe");
 
-        // Mock userMapper.userModelToUser
-        Mockito.when(userMapper.userModelToUser(userModel)).thenReturn(userEntity);
+        when(userMapper.userModelToUser(userModel)).thenReturn(userEntity);
+        when(profileService.generateUsername(any(), any(), any())).thenReturn("username");
+        when(profileService.generateRandomPassword()).thenReturn("password");
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
+        when(userMapper.userToUserModel(userEntity)).thenReturn(userModel);
 
-        // Mock profileService.generateUsername and generateRandomPassword
-        Mockito.when(profileService.generateUsername("John", "Doe", UserType.USER.getDescription())).thenReturn("john.doe");
-        Mockito.when(profileService.generateRandomPassword()).thenReturn("px`assword123");
-
-        // Mock userRepository.save
-        Mockito.when(userRepository.save(userEntity)).thenReturn(userEntity);
-
-        // Perform the test
+        // Act
         UserModel result = userService.createUser(userModel);
 
-        // Verify the state of the result
-        Assertions.assertEquals("john.doe", result.getUsername());
-        Assertions.assertEquals("password123", result.getPassword());
-        Assertions.assertEquals("John", result.getFirstName());
-        Assertions.assertEquals("Doe", result.getLastName());
-        // Add more assertions if needed based on your UserModel structure
+        // Assert
+        assertEquals(userModel, result);
+    }
+
+    @Test
+    void createUser_withException_shouldThrowApiException() throws StorageException {
+        // Arrange
+        UserModel userModel = new UserModel();
+
+        when(userMapper.userModelToUser(userModel)).thenReturn(new User());
+        when(profileService.generateUsername(any(), any(), any())).thenReturn("username");
+        when(profileService.generateRandomPassword()).thenReturn("password");
+        when(userRepository.save(any())).thenThrow(new StorageException("Storage error"));
+
+        // Act and Assert
+        assertThrows(ApiException.class, () -> userService.createUser(userModel));
+    }
+
+    @Test
+    void updateUser_withValidData_shouldReturnUserModel() throws StorageException {
+        // Arrange
+        Long userId = 1L;
+        UserModel userModel = new UserModel();
+        User existingUser = new User();
+        existingUser.setUserId(userId);
+
+        when(userRepository.findById(userId)).thenReturn(existingUser);
+        when(userRepository.save(existingUser)).thenReturn(existingUser);
+        when(userMapper.userToUserModel(existingUser)).thenReturn(userModel);
+
+        // Act
+        UserModel result = userService.updateUser(userId, userModel);
+
+        // Assert
+        assertEquals(userModel, result);
+    }
+
+    @Test
+    void updateUser_withInvalidId_shouldThrowApiException() {
+        // Arrange
+        Long userId = 1L;
+        UserModel userModel = new UserModel();
+
+        when(userRepository.findById(userId)).thenReturn(null);
+
+        // Act and Assert
+        assertThrows(ApiException.class, () -> userService.updateUser(userId, userModel));
+    }
+
+    @Test
+    void deleteUser_withValidId_shouldNotThrowException() {
+        // Arrange
+        Long userId = 1L;
+
+        // Act and Assert
+        assertDoesNotThrow(() -> userService.deleteUser(userId));
+    }
+
+    @Test
+    void deleteUser_withInvalidId_shouldThrowApiException() {
+        // Arrange
+        Long userId = 1L;
+
+        doThrow(new EmptyResultDataAccessException(1)).when(userRepository).deleteById(userId);
+
+        // Act and Assert
+        assertThrows(ApiException.class, () -> userService.deleteUser(userId));
     }
 }
-
