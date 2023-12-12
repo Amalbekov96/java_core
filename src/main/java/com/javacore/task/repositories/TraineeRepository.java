@@ -8,7 +8,7 @@ import java.util.List;
 public interface TraineeRepository {
     Trainee findById(Long id);
 
-    Trainee save(Trainee trainee) throws StorageException, StorageException;
+    Trainee save(Trainee trainee) throws StorageException;
 
     void deleteById(Long id);
 

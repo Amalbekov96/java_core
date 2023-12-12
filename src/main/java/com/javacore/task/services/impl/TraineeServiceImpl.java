@@ -13,6 +13,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 
 @Slf4j
 @Service
@@ -48,14 +50,14 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeModel updateTrainee(Long traineeId, TraineeModel traineeModel) {
         try {
             Trainee existingTrainee = traineeRepository.findById(traineeId);
-            if(existingTrainee != null) {
+            if(existingTrainee == null) {
                 throw new ApiException("Trainee with ID " + traineeId + " not found", ErrorCode.TRAINER_NOT_FOUND);
             }
 
             traineeMapper.update(traineeModel, existingTrainee);
-            existingTrainee = traineeRepository.save(existingTrainee);
+            Trainee savedTrainee = traineeRepository.save(existingTrainee);
 
-            return traineeMapper.traineeToTraineeModel(existingTrainee);
+            return traineeMapper.traineeToTraineeModel(savedTrainee);
         } catch (Exception | StorageException e) {
             log.error("Error updating Trainee", e);
             throw new ApiException("Error updating Trainee", ErrorCode.TRAINER_NOT_FOUND);
@@ -69,6 +71,17 @@ public class TraineeServiceImpl implements TraineeService {
         } catch (Exception e) {
             log.error("Error deleting Trainee", e);
             throw new ApiException("Error deleting Trainee", ErrorCode.TRAINER_NOT_FOUND);
+        }
+    }
+
+    @Override
+    public List<TraineeModel> findAll() {
+        try {
+            List<Trainee> trainees = traineeRepository.findAll();
+            return  traineeMapper.traineesToTraineeModels(trainees);
+        } catch (Exception e) {
+            log.error("Error creating Trainee", e);
+            throw new ApiException("Error creating Trainee", ErrorCode.TRAINER_NOT_FOUND);
         }
     }
 }

@@ -80,7 +80,7 @@ class UserServiceImplTest {
 
         // Mock profileService.generateUsername and generateRandomPassword
         Mockito.when(profileService.generateUsername("John", "Doe", UserType.USER.getDescription())).thenReturn("john.doe");
-        Mockito.when(profileService.generateRandomPassword()).thenReturn("password123");
+        Mockito.when(profileService.generateRandomPassword()).thenReturn("px`assword123");
 
         // Mock userRepository.save
         Mockito.when(userRepository.save(userEntity)).thenReturn(userEntity);

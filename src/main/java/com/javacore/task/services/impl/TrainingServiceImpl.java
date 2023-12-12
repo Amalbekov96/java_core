@@ -40,30 +40,51 @@ public class TrainingServiceImpl implements TrainingService {
     @Override
     public TrainingModel createTraining(TrainingModel trainingModel) {
         try {
-
-            if(trainingModel.getTrainer() == null || trainingModel.getTrainer().getId() == null) {
+            // Check if Trainer information is provided
+            if (trainingModel.getTrainer() == null || trainingModel.getTrainer().getId() == null) {
                 throw new ApiException("Trainer is not created yet", ErrorCode.TRAINER_NOT_FOUND);
             }
 
-            if(trainingModel.getTrainee() == null || trainingModel.getTrainee().getTraineeId() == null) {
+            // Check if Trainee information is provided
+            if (trainingModel.getTrainee() == null || trainingModel.getTrainee().getTraineeId() == null) {
                 throw new ApiException("Trainee is not created yet", ErrorCode.TRAINEE_NOT_FOUND);
             }
 
+            // Retrieve Trainer information
             TrainerModel trainerModel = trainerService.getTrainerById(trainingModel.getTrainer().getId());
+
+            // Check if Trainer exists
+            if (trainerModel == null) {
+                throw new ApiException("Trainer with ID " + trainingModel.getTrainer().getId() + " not found", ErrorCode.TRAINER_NOT_FOUND);
+            }
+
+            // Retrieve Trainee information
             TraineeModel traineeModel = traineeService.getTraineeById(trainingModel.getTrainee().getTraineeId());
 
-            trainingModel.setTrainee(traineeModel);
+            // Check if Trainee exists
+            if (traineeModel == null) {
+                throw new ApiException("Trainee with ID " + trainingModel.getTrainee().getTraineeId() + " not found", ErrorCode.TRAINEE_NOT_FOUND);
+            }
+
+            // Set Trainer and Trainee information in the TrainingModel
             trainingModel.setTrainer(trainerModel);
+            trainingModel.setTrainee(traineeModel);
 
+            // Map TrainingModel to Training entity
             Training trainingEntity = trainingMapper.trainingModelToTraining(trainingModel);
-            trainingEntity = trainingRepository.save(trainingEntity);
-            return trainingMapper.trainingToTrainingModel(trainingEntity);
-        } catch (StorageException e) {
 
-            log.error(String.format("Error creating Training due to %s" , e.getMessage()));
+            // Save the Training entity
+            trainingEntity = trainingRepository.save(trainingEntity);
+
+            // Map the saved Training entity back to TrainingModel
+            return trainingMapper.trainingToTrainingModel(trainingEntity);
+
+        } catch (StorageException e) {
+            log.error(String.format("Error creating Training due to %s", e.getMessage()));
             throw new ApiException(e.getMessage(), ErrorCode.TRAINING_NOT_FOUND);
         }
     }
+
 
     @Override
     public TrainingModel updateTraining(Long trainingId, TrainingModel trainingModel) {

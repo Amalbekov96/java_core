@@ -6,8 +6,12 @@ import com.javacore.task.models.TraineeModel;
 import com.javacore.task.models.UserModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Service
 @RequiredArgsConstructor
 public class TraineeMapper {
 
@@ -53,5 +57,17 @@ public class TraineeMapper {
             trainee.setUser(userMapper.userModelToUser(traineeModel.getUser()));
             // Update other fields as needed
         }
+    }
+
+    public List<TraineeModel> traineesToTraineeModels(List<Trainee> trainees) {
+        return trainees.stream()
+                .map(this::traineeToTraineeModel)
+                .collect(Collectors.toList());
+    }
+
+    public List<Trainee> traineeModelsToTrainees(List<TraineeModel> traineeModels) {
+        return traineeModels.stream()
+                .map(this::traineeModelToTrainee)
+                .collect(Collectors.toList());
     }
 }

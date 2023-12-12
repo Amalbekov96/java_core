@@ -3,8 +3,9 @@ package com.javacore.task.mappers;
 import com.javacore.task.entities.User;
 import com.javacore.task.models.UserModel;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class UserMapper {
 
     public UserModel userToUserModel(User user) {
