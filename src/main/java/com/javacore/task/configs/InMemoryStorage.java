@@ -15,6 +15,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -22,6 +23,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Component
@@ -37,13 +40,11 @@ public class InMemoryStorage {
 
     @PostConstruct
     public void initialize() throws IOException {
-        // Initialize storage with prepared data from the file
         if (dataFilePath != null && !dataFilePath.isEmpty()) {
-            List<String> lines = Files.readAllLines(Path.of(dataFilePath));
-            // Assuming each line in the file corresponds to a serialized entity
-            lines.forEach(this::addEntity);
+            try (Stream<String> lines = Files.lines(Path.of(dataFilePath))) {
+                lines.forEach(this::addEntity);
+            }
         }
-
         ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         scheduler.scheduleAtFixedRate(this::updateFileContent, 0, 2, TimeUnit.MINUTES);
     }
@@ -104,10 +105,14 @@ public class InMemoryStorage {
                 // Deserialize the entity based on the actual structure
                 Object entity = deserializeEntity(entityNamespace, parts[2]);
                 entityStorage.computeIfPresent(entityNamespace, (k, v) -> {
+
+                    v.remove(id);
+                    deleteEntityFromFile(entityNamespace, id);
                     v.put(id, entity);
                     return v;
                 });
             }
+            updateFileContent();
         } catch (StorageException | JsonProcessingException e) {
             log.error("Could not parse json {} with user type {}", parts[2], parts[0]);
         }
@@ -138,8 +143,8 @@ public class InMemoryStorage {
     }
 
     private void updateFileContent() {
-        log.info("START updating the  file content");
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(dataFilePath))) {
+        log.info("START updating the file content");
+        try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(dataFilePath))) {
             // Iterate through the entityStorage map and write each entry to the file
             for (Map.Entry<String, Map<Long, Object>> entry : entityStorage.entrySet()) {
                 for (Map.Entry<Long, Object> innerEntry : entry.getValue().entrySet()) {
@@ -149,10 +154,28 @@ public class InMemoryStorage {
                     writer.newLine();
                 }
             }
-            log.info("FINISH updating the  file content");
         } catch (IOException e) {
             log.warn(e.getMessage());
             e.printStackTrace();
         }
+        log.info("FINISH updating the file content");
     }
+
+    public void deleteEntityFromFile(String namespace, Long id) {
+        try {
+            List<String> updatedLines = Files.lines(Paths.get(dataFilePath))
+                    .filter(line -> {
+                        String[] parts = line.split("\\|");
+                        return parts.length == 3 && parts[0].equals(namespace) && Long.parseLong(parts[1]) == id;
+                    })
+                    .collect(Collectors.toList());
+
+            // Update the file content after removing the entity
+            Files.write(Paths.get(dataFilePath), updatedLines);
+            log.info("Entity with namespace '{}' and ID '{}' deleted successfully from the file.", namespace, id);
+        } catch (IOException e) {
+            log.error("Error deleting entity with namespace '{}' and ID '{}': {}", namespace, id, e.getMessage());
+        }
+    }
+
 }

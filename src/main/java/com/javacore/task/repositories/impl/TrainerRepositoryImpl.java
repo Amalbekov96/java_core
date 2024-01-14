@@ -35,16 +35,17 @@ public class TrainerRepositoryImpl implements TrainerRepository {
 
     @Override
     public Trainer save(Trainer trainer) throws StorageException {
-        // Calculate the next ID
-        Long nextId = inMemoryStorage.calculateNextId("Trainer");
+        // If the Trainer has an ID, it means it already exists, so update it
+        if (trainer.getId() != null) {
+            inMemoryStorage.updateEntity("Trainer|" + trainer.getId() + "|" + serializeEntity(trainer));
+        } else {
+            // If there's no ID, calculate the next ID and save the new Trainer entity
+            Long nextId = inMemoryStorage.calculateNextId("Trainer");
+            trainer.setId(nextId);
+            inMemoryStorage.addEntity("Trainer|" + nextId + "|" + serializeEntity(trainer));
+        }
 
-        // Assign the calculated ID to the trainer entity
-        trainer.setId(nextId);
-
-        // Add the entity to the storage
-        inMemoryStorage.addEntity("Trainer|" + nextId + "|" + serializeEntity(trainer));
-
-        // Return the saved entity
+        // Return the saved or updated entity
         return trainer;
     }
 
