@@ -1,6 +1,6 @@
 package com.javacore.task.exceptions;
 
-public class StorageException extends Throwable {
+public class StorageException extends RuntimeException {
     public StorageException(String s) {
     }
 }

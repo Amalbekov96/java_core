@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
             userEntity.setPassword(password);
             userEntity = userRepository.save(userEntity);
             return userMapper.userToUserModel(userEntity);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error creating User", e);
             throw new ApiException("Error creating User", ErrorCode.USER_NOT_FOUND);
         }
@@ -61,7 +61,7 @@ public class UserServiceImpl implements UserService {
             existingUser = userRepository.save(existingUser);
 
             return userMapper.userToUserModel(existingUser);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error updating User", e);
             throw new ApiException("Error updating User", ErrorCode.USER_NOT_FOUND);
         }

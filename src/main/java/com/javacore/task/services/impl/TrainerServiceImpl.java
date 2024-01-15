@@ -36,7 +36,7 @@ public class TrainerServiceImpl implements TrainerService {
             Trainer trainerEntity = trainerMapper.trainerModelToTrainer(trainerModel);
             trainerEntity = trainerRepository.save(trainerEntity);
             return trainerMapper.trainerToTrainerModel(trainerEntity);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error creating Trainer", e);
             throw new ApiException("Error creating Trainer", ErrorCode.TRAINER_NOT_FOUND);
         }
@@ -53,7 +53,7 @@ public class TrainerServiceImpl implements TrainerService {
             existingTrainer = trainerRepository.save(existingTrainer);
 
             return trainerMapper.trainerToTrainerModel(existingTrainer);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error updating Trainer", e);
             throw new ApiException("Error updating Trainer", ErrorCode.TRAINER_NOT_FOUND);
         }

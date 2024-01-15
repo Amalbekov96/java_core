@@ -1,4 +1,4 @@
-package com.javacore.task.configs;
+package com.javacore.task.repositories;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,7 +61,6 @@ public class InMemoryStorage {
                 entityStorage.computeIfAbsent(entityNamespace, k -> new HashMap<>()).put(id, entity);
             }
         } catch (StorageException | JsonProcessingException e) {
-            e.printStackTrace();
             log.error("Could not parse json {} with user type {} due to {}", parts[2], parts[0], e.getMessage());
         }
     }
@@ -156,7 +155,6 @@ public class InMemoryStorage {
             }
         } catch (IOException e) {
             log.warn(e.getMessage());
-            e.printStackTrace();
         }
         log.info("FINISH updating the file content");
     }

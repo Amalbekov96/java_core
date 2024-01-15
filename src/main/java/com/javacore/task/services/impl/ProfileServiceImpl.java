@@ -1,6 +1,6 @@
 package com.javacore.task.services.impl;
 
-import com.javacore.task.configs.InMemoryStorage;
+import com.javacore.task.repositories.InMemoryStorage;
 import com.javacore.task.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

@@ -4,3 +4,4 @@ User|1|{"userId":1,"firstName":"John","lastName":"Doe","username":"john.doe","pa
 User|2|{"userId":2,"firstName":"Antony","lastName":"Leo","username":"Antony.Leo","password":"securepassword","isActive":true}
 Trainee|2|{"traineeId":2,"dateOfBirth":"1990-05-15T00:00:00.000+00:00","address":"123 Main St","user":{"userId":102,"firstName":"Alice","lastName":"Trainee","username":"alice_trainee","password":"password456","isActive":true}}
 Trainer|1|{"id":1,"specialization":{"id":2,"trainingTypeName":"Spring"},"user":{"userId":2,"firstName":"Antony","lastName":"Leo","username":"Antony.Leo","password":"securepassword","isActive":true}}
+Trainer|2|{"id":2,"specialization":{"id":2,"trainingTypeName":"Spring"},"user":{"userId":2,"firstName":"Antony","lastName":"Leo","username":"Antony.Leo","password":"securepassword","isActive":true}}

@@ -3,7 +3,6 @@ package com.javacore.task.services.impl;
 import com.javacore.task.entities.Training;
 import com.javacore.task.enums.ErrorCode;
 import com.javacore.task.exceptions.ApiException;
-import com.javacore.task.exceptions.EntityIsNotFound;
 import com.javacore.task.exceptions.StorageException;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.TraineeModel;
@@ -97,7 +96,7 @@ public class TrainingServiceImpl implements TrainingService {
             existingTraining = trainingRepository.save(existingTraining);
 
             return trainingMapper.trainingToTrainingModel(existingTraining);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error updating Training", e);
             throw new ApiException("Error updating Training", ErrorCode.TRAINING_NOT_FOUND);
         }

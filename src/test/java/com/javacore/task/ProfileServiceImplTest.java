@@ -1,6 +1,6 @@
 package com.javacore.task;
 
-import com.javacore.task.configs.InMemoryStorage;
+import com.javacore.task.repositories.InMemoryStorage;
 import com.javacore.task.services.impl.ProfileServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

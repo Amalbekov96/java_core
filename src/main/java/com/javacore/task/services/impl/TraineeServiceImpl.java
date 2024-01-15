@@ -40,7 +40,7 @@ public class TraineeServiceImpl implements TraineeService {
             Trainee traineeEntity = traineeMapper.traineeModelToTrainee(traineeModel);
             traineeEntity = traineeRepository.save(traineeEntity);
             return traineeMapper.traineeToTraineeModel(traineeEntity);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error creating Trainee", e);
             throw new ApiException("Error creating Trainee", ErrorCode.TRAINER_NOT_FOUND);
         }
@@ -58,7 +58,7 @@ public class TraineeServiceImpl implements TraineeService {
             Trainee savedTrainee = traineeRepository.save(existingTrainee);
 
             return traineeMapper.traineeToTraineeModel(savedTrainee);
-        } catch (Exception | StorageException e) {
+        } catch (Exception e) {
             log.error("Error updating Trainee", e);
             throw new ApiException("Error updating Trainee", ErrorCode.TRAINER_NOT_FOUND);
         }

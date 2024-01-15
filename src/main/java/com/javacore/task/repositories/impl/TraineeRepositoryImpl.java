@@ -2,13 +2,12 @@ package com.javacore.task.repositories.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javacore.task.configs.InMemoryStorage;
+import com.javacore.task.repositories.InMemoryStorage;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.exceptions.StorageException;
 import com.javacore.task.repositories.TraineeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

@@ -2,7 +2,7 @@ package com.javacore.task.repositories.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.javacore.task.configs.InMemoryStorage;
+import com.javacore.task.repositories.InMemoryStorage;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.exceptions.StorageException;
 import com.javacore.task.repositories.TrainerRepository;
