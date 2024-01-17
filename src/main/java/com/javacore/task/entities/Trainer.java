@@ -21,6 +21,6 @@ public class Trainer {
     private TrainingType specialization;
 
     @OneToOne
-    @JoinColumn(name = "\"USER_ID\"", referencedColumnName = "\"USER_ID\"")
+    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
     private User user;
 }

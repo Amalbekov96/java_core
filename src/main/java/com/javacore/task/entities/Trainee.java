@@ -25,6 +25,6 @@ public class Trainee {
     private String address;
 
     @OneToOne
-    @JoinColumn(name = "\"USER_ID\"", referencedColumnName = "\"USER_ID\"")
+    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
     private User user;
 }
