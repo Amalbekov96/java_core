@@ -1,15 +1,21 @@
 package com.javacore.task.controllers;
 
 import com.javacore.task.models.TrainingModel;
+import com.javacore.task.models.request.TrainingRequest;
 import com.javacore.task.services.TrainingService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
+@PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainings")
 @RequiredArgsConstructor
 public class TrainingController {
@@ -18,25 +24,33 @@ public class TrainingController {
 
     @GetMapping("/{trainingId}")
     public ResponseEntity<TrainingModel> getTrainingById(@PathVariable Long trainingId) {
+        log.info("Endpoint called: GET /trainings/{}", trainingId);
         TrainingModel trainingModel = trainingService.getTrainingById(trainingId);
+        log.info("Response: {}", trainingModel);
         return ResponseEntity.ok(trainingModel);
     }
-
-    @PostMapping
-    public ResponseEntity<TrainingModel> createTraining(@RequestBody TrainingModel trainingModel) {
-        TrainingModel createdTraining = trainingService.createTraining(trainingModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTraining);
-    }
-
     @PutMapping("/{trainingId}")
     public ResponseEntity<TrainingModel> updateTraining(@PathVariable Long trainingId, @RequestBody TrainingModel trainingModel) {
+        log.info("Endpoint called: PUT /trainings/{}", trainingId);
         TrainingModel updatedTraining = trainingService.updateTraining(trainingId, trainingModel);
+        log.info("Response: {}", updatedTraining);
         return ResponseEntity.ok(updatedTraining);
     }
 
     @DeleteMapping("/{trainingId}")
-    public ResponseEntity<Void> deleteTraining(@PathVariable Long trainingId) {
+    public ResponseEntity<String> deleteTraining(@PathVariable Long trainingId) {
+        log.info("Endpoint called: DELETE /trainings/{}", trainingId);
         trainingService.deleteTraining(trainingId);
-        return ResponseEntity.noContent().build();
+        log.info("Response: deleted successfully");
+        return new ResponseEntity<>("deleted successfully", HttpStatus.OK);
     }
+
+    @PostMapping
+    public ResponseEntity<String> saveTraining(@Valid @RequestBody TrainingRequest training) throws IOException {
+        log.info("Endpoint called: POST /training, Request: {}", training);
+        trainingService.saveTraining(training);
+        log.info("Response: saved successfully");
+        return new ResponseEntity<>("saved successfully", HttpStatus.OK);
+    }
+
 }

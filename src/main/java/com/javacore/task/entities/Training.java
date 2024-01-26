@@ -2,13 +2,16 @@ package com.javacore.task.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
 @Entity
+@Table
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Training {
@@ -37,5 +40,5 @@ public class Training {
     private Date trainingDate;
 
     @Column(name = "TRAINING_DURATION", nullable = false)
-    private int trainingDuration;
+    private Number trainingDuration;
 }

@@ -1,4 +1,4 @@
-package com.javacore.task.models;
+package com.javacore.task.models.request;
 
 import com.javacore.task.enums.UserRole;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,4 @@ import lombok.NoArgsConstructor;
 public class SignUpRequest {
     private String firstName;
     private String lastName;
-    private String username;
-    private String password;
-    private UserRole role;
 }
