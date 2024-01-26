@@ -1,6 +1,5 @@
 package com.javacore.task.models.request;
 
-import com.javacore.task.enums.UserRole;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

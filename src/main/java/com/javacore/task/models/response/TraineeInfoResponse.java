@@ -1,6 +1,5 @@
 package com.javacore.task.models.response;
 
-import com.javacore.task.models.response.TrainersListResponse;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
