@@ -1,16 +1,14 @@
 package com.javacore.task.repositories;
 
 import com.javacore.task.entities.User;
-import com.javacore.task.exceptions.StorageException;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
-public interface UserRepository {
-    User findById(Long id);
-
-    User save(User user) throws StorageException;
-
-    void deleteById(Long id);
-
-    List<User> findAll();
+import java.util.Optional;
+@Repository
+public interface UserRepository extends JpaRepository<User, Long> {
+    @Query("select u from User u where u.username = ?1")
+    Optional<User> findUserByUsername(String username);
+    boolean existsByUsername(String username);
 }

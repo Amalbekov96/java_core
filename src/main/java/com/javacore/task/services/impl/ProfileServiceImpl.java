@@ -1,6 +1,6 @@
 package com.javacore.task.services.impl;
 
-import com.javacore.task.configs.InMemoryStorage;
+import com.javacore.task.repositories.UserRepository;
 import com.javacore.task.services.ProfileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,17 +11,17 @@ import java.util.Random;
 @Service
 public class ProfileServiceImpl implements ProfileService {
 
-    private final InMemoryStorage inMemoryStorage;
+    private final UserRepository userRepository;
     private static final Random RANDOM = new Random();
     private static final int PASSWORD_LENGTH = 10;
     @Override
-    public String generateUsername(String firstName, String lastName, String userType) {
+    public String generateUsername(String firstName, String lastName) {
         String baseUsername = firstName + "." + lastName;
         String username = baseUsername;
 
         // Check if the username already exists
         int serialNumber = 1;
-        while (inMemoryStorage.usernameExists(username, userType)) {
+        while (userRepository.existsByUsername(username)) {
             username = baseUsername + serialNumber;
             serialNumber++;
         }

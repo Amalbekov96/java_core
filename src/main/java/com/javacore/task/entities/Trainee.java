@@ -2,14 +2,17 @@ package com.javacore.task.entities;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
-//@Entity
-//@Table(name = "TRAINEE")
+@Entity
+@Table
 @Data
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Trainee {
@@ -28,4 +31,7 @@ public class Trainee {
     @OneToOne
     @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
     private User user;
+
+    @ManyToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
+    private List<Trainer> trainers;
 }

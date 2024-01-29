@@ -13,7 +13,6 @@ public class UserMapper {
         userModel.setFirstName(user.getFirstName());
         userModel.setLastName(user.getLastName());
         userModel.setUsername(user.getUsername());
-        userModel.setPassword(user.getPassword());
         userModel.setIsActive(user.getIsActive());
         return userModel;
     }
@@ -24,7 +23,6 @@ public class UserMapper {
         user.setFirstName(userModel.getFirstName());
         user.setLastName(userModel.getLastName());
         user.setUsername(userModel.getUsername());
-        user.setPassword(userModel.getPassword());
         user.setIsActive(userModel.getIsActive());
         return user;
     }
@@ -35,9 +33,7 @@ public class UserMapper {
             user.setFirstName(userModel.getFirstName());
             user.setLastName(userModel.getLastName());
             user.setUsername(userModel.getUsername());
-            user.setPassword(userModel.getPassword());
             user.setIsActive(userModel.getIsActive());
-            // Update other fields as needed
         }
     }
 }

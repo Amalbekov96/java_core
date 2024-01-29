@@ -4,9 +4,10 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import com.javacore.task.enums.TrainingTypes;
 
-//@Entity
-//@Table(name = "TRAINING_TYPE")
+@Entity
+@Table
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,6 +18,6 @@ public class TrainingType {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "TRAINING_TYPE_NAME", nullable = false)
-    private String trainingTypeName;
+    @Enumerated(EnumType.STRING)
+    private TrainingTypes trainingType;
 }
