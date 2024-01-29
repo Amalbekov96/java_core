@@ -3,6 +3,8 @@ package com.javacore.task.repositories;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
+import com.javacore.task.entities.TrainingType;
+import com.javacore.task.enums.TrainingTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -72,7 +74,7 @@ public interface TraineeRepository extends JpaRepository<Trainee,Long>  {
 
             @Param("trainerName") String trainerName,
 
-            @Param("trainingType") String trainingType
+            @Param("trainingType") TrainingTypes trainingType
 
     );
 

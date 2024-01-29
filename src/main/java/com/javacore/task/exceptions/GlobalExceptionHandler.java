@@ -46,4 +46,9 @@ public class GlobalExceptionHandler {
         log.error("An unexpected error occurred: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
     }
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleException(UserNotFoundException e) {
+        log.error("USER not found: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("user with such name not found");
+    }
 }

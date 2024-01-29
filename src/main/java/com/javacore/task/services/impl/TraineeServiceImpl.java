@@ -3,7 +3,9 @@ package com.javacore.task.services.impl;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
+import com.javacore.task.entities.TrainingType;
 import com.javacore.task.enums.ErrorCode;
+import com.javacore.task.enums.TrainingTypes;
 import com.javacore.task.exceptions.ApiException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
@@ -165,8 +167,9 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public List<TrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
+        log.info("Retrieving Trainee Trainings by : Criteria: {}", request);
          List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeUsername(),
-             request.periodFrom(), request.periodTo(), request.trainerName(),request.trainingType());
+             request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypes.valueOf(request.trainingType()));
             log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}",request, trainings);
             return trainingMapper.mapTrainingsToDto(trainings);
         }
