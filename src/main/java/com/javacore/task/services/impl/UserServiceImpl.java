@@ -2,9 +2,7 @@ package com.javacore.task.services.impl;
 
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.ErrorCode;
-import com.javacore.task.enums.UserRole;
 import com.javacore.task.exceptions.ApiException;
-import com.javacore.task.exceptions.StorageException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.UserMapper;
 import com.javacore.task.models.UserModel;
@@ -38,7 +36,7 @@ public class UserServiceImpl implements UserService {
     public UserModel createUser(UserModel userModel) {
         try {
             User userEntity = userMapper.userModelToUser(userModel);
-            String username = profileService.generateUsername(userEntity.getFirstName(), userEntity.getLastName(), UserRole.USER.getDescription());
+            String username = profileService.generateUsername(userEntity.getFirstName(), userEntity.getLastName());
             String password = profileService.generateRandomPassword();
             userEntity.setUsername(username);
             userEntity.setPassword(password);
@@ -81,7 +79,7 @@ public class UserServiceImpl implements UserService {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String username) {
-                return userRepository.findByUsername(username)
+                return userRepository.findUserByUsername(username)
                         .orElseThrow(() -> new UsernameNotFoundException("User not found"));
             }
         };

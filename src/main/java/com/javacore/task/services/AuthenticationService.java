@@ -1,12 +1,13 @@
 package com.javacore.task.services;
 
-import com.javacore.task.models.JwtAuthenticationResponse;
-import com.javacore.task.models.SignUpRequest;
-import com.javacore.task.models.SigninRequest;
+import com.javacore.task.models.request.SignInRequest;
+import com.javacore.task.models.request.TraineeRequest;
+import com.javacore.task.models.request.TrainerRequest;
+import com.javacore.task.models.response.SignInResponse;
+import com.javacore.task.models.response.SignUpResponse;
 
 public interface AuthenticationService {
-
-    JwtAuthenticationResponse signup(SignUpRequest request);
-
-    JwtAuthenticationResponse signin(SigninRequest request);
+    SignUpResponse traineeSignUp(TraineeRequest request);
+    SignUpResponse trainerSignUp(TrainerRequest request);
+    SignInResponse signIn(SignInRequest request);
 }

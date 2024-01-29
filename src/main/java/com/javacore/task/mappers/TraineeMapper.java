@@ -1,11 +1,17 @@
 package com.javacore.task.mappers;
 
 import com.javacore.task.entities.Trainee;
+import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.User;
+import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.TraineeModel;
+import com.javacore.task.models.response.TrainersListResponse;
 import com.javacore.task.models.UserModel;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -51,7 +57,37 @@ public class TraineeMapper {
             trainee.setDateOfBirth(traineeModel.getDateOfBirth());
             trainee.setTraineeId(traineeModel.getTraineeId());
             trainee.setUser(userMapper.userModelToUser(traineeModel.getUser()));
-            // Update other fields as needed
         }
+    }
+
+    public List<TrainersListResponse> mapTraineesTrainersToDto(List<Trainer> trainers) {
+        return trainers.stream()
+                .map(this::mapTrainerToDto)
+                .collect(Collectors.toList());
+    }
+
+    private TrainersListResponse mapTrainerToDto(Trainer trainer) {
+        return new TrainersListResponse(
+                trainer.getUser().getUsername(),
+                trainer.getUser().getFirstName(),
+                trainer.getUser().getLastName(),
+                trainer.getSpecialization() != null ? trainer.getSpecialization().getTrainingType().name() : null
+        );
+    }
+    public TraineeInfoResponse traineeInfoResponse(Trainee trainee) {
+        return new TraineeInfoResponse(
+                trainee.getUser().getFirstName(),
+                trainee.getUser().getLastName(),
+                trainee.getDateOfBirth(),
+                trainee.getAddress(),
+                trainee.getUser().getIsActive(),
+                trainee.getTrainers().stream()
+                        .map(trainer -> new TrainersListResponse(
+                                trainer.getUser().getUsername(),
+                                trainer.getUser().getFirstName(),
+                                trainer.getUser().getLastName(),
+                                trainer.getSpecialization().getTrainingType().name()
+                        ))
+                        .collect(Collectors.toList()));
     }
 }
