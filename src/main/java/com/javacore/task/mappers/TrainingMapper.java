@@ -1,11 +1,9 @@
 package com.javacore.task.mappers;
 
-import com.javacore.task.entities.Trainee;
-import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
-import com.javacore.task.entities.TrainingType;
 import com.javacore.task.models.*;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TraineeTrainingInfoResponse;
+import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,56 +20,6 @@ public class TrainingMapper {
 
     private final TrainingTypeMapper trainingTypeMapper;
 
-    public TrainingModel trainingToTrainingModel(Training training) {
-        TrainingModel trainingModel = new TrainingModel();
-        trainingModel.setId(training.getId());
-        trainingModel.setTrainingName(training.getTrainingName());
-        trainingModel.setTrainingDate(training.getTrainingDate());
-        trainingModel.setTrainingDuration(training.getTrainingDuration());
-
-        if (training.getTrainee() != null) {
-            TraineeModel traineeModel = traineeMapper.traineeToTraineeModel(training.getTrainee());
-            trainingModel.setTrainee(traineeModel);
-        }
-
-        if (training.getTrainer() != null) {
-            TrainerModel trainerModel = trainerMapper.trainerToTrainerModel(training.getTrainer());
-            trainingModel.setTrainer(trainerModel);
-        }
-
-        if (training.getTrainingType() != null) {
-            TrainingTypeModel trainingTypeModel = trainingTypeMapper.trainingTypeToTrainingTypeModel(training.getTrainingType());
-            trainingModel.setTrainingTypeModel(trainingTypeModel);
-        }
-
-        return trainingModel;
-    }
-
-    public Training trainingModelToTraining(TrainingModel trainingModel) {
-        Training training = new Training();
-        training.setId(trainingModel.getId());
-        training.setTrainingName(trainingModel.getTrainingName());
-        training.setTrainingDate(trainingModel.getTrainingDate());
-        training.setTrainingDuration(trainingModel.getTrainingDuration());
-
-        if (trainingModel.getTrainee() != null) {
-            Trainee trainee = traineeMapper.traineeModelToTrainee(trainingModel.getTrainee());
-            training.setTrainee(trainee);
-        }
-
-        if (trainingModel.getTrainer() != null) {
-            Trainer trainer = trainerMapper.trainerModelToTrainer(trainingModel.getTrainer());
-            training.setTrainer(trainer);
-        }
-
-        if (trainingModel.getTrainingTypeModel() != null) {
-            TrainingType trainingType = trainingTypeMapper.trainingTypeModelToTrainingType(trainingModel.getTrainingTypeModel());
-            training.setTrainingType(trainingType);
-        }
-
-        return training;
-    }
-
     public void update(TrainingModel trainingModel, Training existingTraining) {
         if (trainingModel != null && existingTraining != null) {
             existingTraining.setId(trainingModel.getId());
@@ -83,19 +31,31 @@ public class TrainingMapper {
             existingTraining.setTrainingDuration(trainingModel.getTrainingDuration());
         }
     }
-    public List<TrainingInfoResponse> mapTrainingsToDto(List<Training> trainings) {
+    public List<TraineeTrainingInfoResponse> mapTraineeTrainingsToDto(List<Training> trainings) {
         return trainings.stream()
-                .map(this::mapTrainingToDto)
+                .map(this::mapTraineeTrainingToDto)
                 .collect(Collectors.toList());
     }
-    private TrainingInfoResponse mapTrainingToDto(Training training) {
-        return new TrainingInfoResponse(
+    private TraineeTrainingInfoResponse mapTraineeTrainingToDto(Training training) {
+        return new TraineeTrainingInfoResponse(
                 training.getTrainingName(),
                 training.getTrainingDate(),
                 training.getTrainer().getSpecialization() != null ? training.getTrainer().getSpecialization().getTrainingType().name() : null,
                 training.getTrainingDuration(),
-                training.getTrainer().getUser().getUsername(),
-                training.getTrainee() != null ? training.getTrainee().getUser().getUsername() : null
+                training.getTrainee() != null ? training.getTrainee().getUser().getUsername() : null);
+    }
+    public List<TrainerTrainingInfoResponse> mapTrainerTrainingsToDto(List<Training> trainings) {
+        return trainings.stream()
+                .map(this::mapTrainerTrainingToDto)
+                .collect(Collectors.toList());
+    }
+    private TrainerTrainingInfoResponse mapTrainerTrainingToDto(Training training) {
+        return new TrainerTrainingInfoResponse(
+                training.getTrainingName(),
+                training.getTrainingDate(),
+                training.getTrainer().getSpecialization() != null ? training.getTrainer().getSpecialization().getTrainingType().name() : null,
+                training.getTrainingDuration(),
+                training.getTrainer().getUser().getUsername()
         );
     }
 

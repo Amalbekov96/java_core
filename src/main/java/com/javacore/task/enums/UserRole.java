@@ -8,9 +8,7 @@ import lombok.Getter;
 @Getter
 public enum UserRole {
     TRAINER("Trainer"),
-    TRAINEE("Trainee"),
-    TRAINING("Training"),
-    USER("User");
+    TRAINEE("Trainee");
 
     private final String description;
 

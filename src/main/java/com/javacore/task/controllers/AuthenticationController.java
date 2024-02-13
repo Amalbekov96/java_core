@@ -8,10 +8,10 @@ import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.services.AuthenticationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -36,4 +36,12 @@ public class AuthenticationController {
         log.info("Endpoint called: POST /api/auth/sign-in");
         return authenticationService.signIn(request);
     }
+    @PutMapping
+    @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
+    public ResponseEntity<String> updateLogin(@RequestParam String username, @RequestParam("password") String password, @RequestParam("newPassword") String newPassword) {
+        log.info("Endpoint called: POST /trainers?{}", username);
+        authenticationService.changePassword(username, password, newPassword);
+        return new ResponseEntity<>("password successfully updated!", HttpStatus.OK);
+    }
+
 }

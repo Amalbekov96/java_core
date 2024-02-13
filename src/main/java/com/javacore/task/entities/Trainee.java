@@ -34,4 +34,7 @@ public class Trainee {
 
     @ManyToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
     private List<Trainer> trainers;
+
+    @OneToMany(mappedBy = "trainee", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.REFRESH})
+    private List<Training> trainings;
 }

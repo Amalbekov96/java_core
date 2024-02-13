@@ -1,26 +1,23 @@
 package com.javacore.task.services;
 
 import com.javacore.task.models.*;
+import com.javacore.task.models.request.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
+import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 
 import java.util.List;
 
 public interface TraineeService {
     TraineeModel getTraineeById(Long traineeId);
-
-    TraineeModel createTrainee(TraineeModel traineeModel);
-
-    TraineeModel updateTrainee(Long traineeId, TraineeModel traineeModel);
-
-    void deleteTrainee(Long traineeId);
+    TraineeProfileUpdateResponse updateTrainee(TraineeUpdateRequest request);
+    void deleteTrainee(String username);
     TraineeInfoResponse findTraineeProfileByUsername(String username);
-    void changeTraineePassword(long id,String password, String newPassword);
-    String updateTraineeStatus(boolean status, long traineeId);
+    String updateTraineeStatus(boolean status, String username);
     List<TrainersListResponse> updateTraineeTrainersList(String username, List<String> trainersUsernames);
     List<TrainersListResponse> getNotAssignedActiveTrainersListForTrainee(String username);
-    List<TrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request);
+    List<TraineeTrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request);
 
 }

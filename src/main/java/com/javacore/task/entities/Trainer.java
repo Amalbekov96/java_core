@@ -22,7 +22,7 @@ public class Trainer {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "SPECIALIZATION_ID", referencedColumnName = "ID")
+    @JoinColumn(name = "SPECIALIZATION_ID")
     private TrainingType specialization;
 
     @OneToOne
@@ -32,4 +32,7 @@ public class Trainer {
     @ManyToMany(cascade = {CascadeType.REMOVE,
             CascadeType.DETACH},mappedBy = "trainers",fetch = FetchType.EAGER)
     private List<Trainee> trainees;
+
+    @OneToMany(mappedBy = "trainer", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.REFRESH})
+    private List<Training> trainings;
 }

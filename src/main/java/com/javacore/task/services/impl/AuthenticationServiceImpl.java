@@ -5,6 +5,7 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.UserRole;
+import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.models.request.TraineeRequest;
 import com.javacore.task.models.request.TrainerRequest;
@@ -108,6 +109,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .generatedPassword(password)
                 .role(user.getRole())
                 .build();
+    }
+    @Override
+    public void changePassword(String username, String password, String newPassword) {
+        User user = userRepository.findUserByUsername(username).orElseThrow(()-> {
+            log.warn("Response: User not found");
+            return new UserNotFoundException(String.format("User with username: %s not found", username));
+        });
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new com.javacore.task.exceptions.BadCredentialsException("wrong password");
+        }
+        userRepository.changePassword(user.getUserId(), passwordEncoder.encode(newPassword));
+        log.info("Changed password for User");
     }
 
 

@@ -3,7 +3,6 @@ package com.javacore.task.repositories;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
-import com.javacore.task.entities.TrainingType;
 import com.javacore.task.enums.TrainingTypes;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -18,18 +17,13 @@ import java.util.Optional;
 public interface TraineeRepository extends JpaRepository<Trainee,Long>  {
     @Query("select t from Trainee t where t.user.username = ?1")
     Optional<Trainee> findTraineeByUserUsername(String username);
-
     @Modifying
-    @Query("update User u set u.password = :newPassword where u.userId in (select t.user.userId from Trainee t where t.traineeId = :id)")
-    void changeTraineePassword(@Param("id") long id,@Param("newPassword") String newPassword);
-
-    @Modifying
-    @Query(nativeQuery = true, value = "UPDATE users SET is_active = true WHERE id IN (SELECT t.user_id FROM trainee t WHERE t.id = ?1)")
+    @Query(nativeQuery = true, value = "UPDATE users SET is_active = true WHERE users.user_id IN (SELECT t.user_id FROM trainee t WHERE t.trainee_id = ?1)")
     void activateTrainee(long id);
 
 
     @Modifying
-    @Query(nativeQuery = true, value = "UPDATE users SET is_active = false WHERE id IN (SELECT t.user_id FROM trainee t WHERE t.id = ?1)")
+    @Query(nativeQuery = true, value = "UPDATE users SET is_active = false WHERE users.user_id IN (SELECT t.user_id FROM trainee t WHERE t.trainee_id = ?1)")
     void deactivateTrainee(long id);
 
 

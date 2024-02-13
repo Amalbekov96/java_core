@@ -30,7 +30,7 @@ public class Training {
     private Trainer trainer;
 
     @ManyToOne
-    @JoinColumn(name = "TRAINING_TYPE_ID", referencedColumnName = "ID")
+    @JoinColumn(name = "TRAINING_TYPE_ID")
     private TrainingType trainingType;
 
     @Column(name = "TRAINING_NAME", nullable = false)

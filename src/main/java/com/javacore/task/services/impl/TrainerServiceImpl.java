@@ -4,21 +4,20 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
 import com.javacore.task.enums.ErrorCode;
 import com.javacore.task.exceptions.ApiException;
-import com.javacore.task.exceptions.BadCredentialsException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TrainerMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.*;
 import com.javacore.task.models.request.TrainerTrainingsRequest;
+import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TrainerInfoResponse;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TrainerTrainingInfoResponse;
+import com.javacore.task.models.response.TrainerUpdateResponse;
 import com.javacore.task.repositories.TrainerRepository;
-import com.javacore.task.repositories.TrainingRepository;
 import com.javacore.task.services.TrainerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,11 +29,8 @@ import java.util.List;
 public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerMapper trainerMapper;
-    private final PasswordEncoder passwordEncoder;
     private final TrainerRepository trainerRepository;
-    private final TrainingRepository trainingRepository;
     private final TrainingMapper trainingDTOMapper;
-
 
     @Override
     public TrainerModel getTrainerById(Long trainerId) {
@@ -49,45 +45,17 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public TrainerModel createTrainer(TrainerModel trainerModel) {
+    public TrainerUpdateResponse updateTrainer(TrainerUpdateRequest request) {
         try {
-            Trainer trainerEntity = trainerMapper.trainerModelToTrainer(trainerModel);
-            trainerEntity = trainerRepository.save(trainerEntity);
-            return trainerMapper.trainerToTrainerModel(trainerEntity);
-        } catch (Exception e) {
-            log.error("Error creating Trainer", e);
-            throw new ApiException("Error creating Trainer", ErrorCode.TRAINER_NOT_FOUND);
-        }
-    }
+            Trainer existingTrainer = trainerRepository.findByUserUsername(request.userName()).orElseThrow(
+                    () -> new UserNotFoundException("Trainer not found"));
 
-    @Override
-    public TrainerModel updateTrainer(Long trainerId, TrainerModel trainerModel) {
-        try {
-            Trainer existingTrainer = trainerRepository.findById(trainerId).orElseThrow(
-                    () -> new UserNotFoundException(String.format("Trainer with id: %d not found", trainerId)));
-            if(existingTrainer == null)
-                throw new ApiException("Trainer with ID " + trainerId + " not found", ErrorCode.TRAINER_NOT_FOUND);
-
-            trainerMapper.update(trainerModel, existingTrainer);
-            existingTrainer = trainerRepository.save(existingTrainer);
-
-            return trainerMapper.trainerToTrainerModel(existingTrainer);
+           Trainer trainer =  trainerMapper.update(request, existingTrainer);
+            trainerRepository.save(trainer);
+            return trainerMapper.trainerToTrainerUpdateResponse(trainer);
         } catch (Exception e) {
             log.error("Error updating Trainer", e);
             throw new ApiException("Error updating Trainer", ErrorCode.TRAINER_NOT_FOUND);
-        }
-    }
-
-    @Override
-    public void deleteTrainer(Long trainerId) {
-        try {
-            List<Training> trainings = trainingRepository.findByTrainerId(trainerId);
-            trainings.forEach(training -> trainingRepository.deleteById(training.getId()));
-            trainerRepository.deleteById(trainerId);
-            log.info("Deleted Trainer with id: {}", trainerId);
-        } catch (Exception e) {
-            log.error("Error deleting Trainer", e);
-            throw new ApiException("Error deleting Trainer", ErrorCode.TRAINER_NOT_FOUND);
         }
     }
 
@@ -102,41 +70,29 @@ public class TrainerServiceImpl implements TrainerService {
     }
 
     @Override
-    public void changeTrainerPassword(long id, String password, String newPassword) {
-        Trainer trainer = trainerRepository.findById(id).orElseThrow(()-> {
-            log.warn("Response: Trainer not found");
-            return new UserNotFoundException(String.format("Trainer with id: %d not found", id));
+    public String updateTrainerStatus(boolean status, String username) {
+        Trainer trainer = trainerRepository.findByUserUsername(username).orElseThrow(()->{
+            log.warn("Response: Trainee not found");
+            return new UserNotFoundException("Trainee not found");
         });
-        if (!passwordEncoder.matches(password, trainer.getUser().getPassword())) {
-            throw new BadCredentialsException("wrong password");
-        }
-        trainerRepository.changeTrainerPassword(id, passwordEncoder.encode(newPassword));
-        log.info("Changed password for Trainer");
-    }
 
-    @Override
-    public String updateTrainerStatus(boolean status, long trainerId) {
-        boolean isActive = trainerRepository.findById(trainerId).orElseThrow(()-> {
-            log.warn("Response: Trainer not found");
-            return new UserNotFoundException(String.format("Trainer with id: %d not found", trainerId));
-        }).getUser().getIsActive();
-        if (status && !isActive){
-            trainerRepository.activateTrainer(trainerId);
-            log.info("Activated Trainee with id: {}", trainerId);
+        if (status && !trainer.getUser().getIsActive()){
+            trainerRepository.activateTrainer(trainer.getId());
+            log.info("Activated Trainer with id: {}", trainer.getId());
             return "Activated";
-        } else if (!status && isActive) {
-            trainerRepository.deactivateTrainer(trainerId);
-            log.info("Deactivated Trainee with id: {}", trainerId);
+        } else if (!status && trainer.getUser().getIsActive()) {
+            trainerRepository.deactivateTrainer(trainer.getId());
+            log.info("Deactivated Trainer with id: {}", trainer.getId());
             return "Deactivated";
         } else {
-            log.info("Trainee with id {} is already in the desired state", trainerId);
-            throw new IllegalArgumentException("Trainer is already in the desired state");
+            log.info("Trainee with id {} is already in the desired state", trainer.getId());
+            throw  new IllegalArgumentException("Trainee is already in the desired state");
         }
     }
     @Override
-    public List<TrainingInfoResponse> getTrainerTrainingsByCriteria(TrainerTrainingsRequest request) {
+    public List<TrainerTrainingInfoResponse> getTrainerTrainingsByCriteria(TrainerTrainingsRequest request) {
         List<Training> trainings = trainerRepository.getTrainerTrainingsByCriteria(request.username(),request.periodFrom(),request.periodTo(),request.traineeName());
         log.info("Retrieved Trainer Trainings by Criteria: {}, Trainings: {}",request, trainings);
-        return trainingDTOMapper.mapTrainingsToDto(trainings);
+        return trainingDTOMapper.mapTrainerTrainingsToDto(trainings);
     }
 }

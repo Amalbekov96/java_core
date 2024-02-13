@@ -1,9 +1,6 @@
 package com.javacore.task.models.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
@@ -11,11 +8,11 @@ import java.util.Date;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainingInfoResponse {
+@Builder
+public class TraineeTrainingInfoResponse {
     private String trainingName;
     private Date trainingDate;
     private String trainingTypes;
     private Number duration;
-    private String traineeName;
     private String trainerName;
 }

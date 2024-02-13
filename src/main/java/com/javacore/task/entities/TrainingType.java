@@ -15,7 +15,6 @@ public class TrainingType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ID")
     private Long id;
 
     @Enumerated(EnumType.STRING)

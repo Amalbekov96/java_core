@@ -1,17 +1,17 @@
 package com.javacore.task.models.response;
 
-import com.javacore.task.models.TraineeModel;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
-@Setter
-@Getter
+@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TrainerInfoResponse {
+public class TrainerUpdateResponse {
+    private String username;
     private String firstName;
     private String lastName;
     private String trainingTypes;

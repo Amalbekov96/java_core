@@ -22,29 +22,6 @@ public class TrainingController {
 
     private final TrainingService trainingService;
 
-    @GetMapping("/{trainingId}")
-    public ResponseEntity<TrainingModel> getTrainingById(@PathVariable Long trainingId) {
-        log.info("Endpoint called: GET /trainings/{}", trainingId);
-        TrainingModel trainingModel = trainingService.getTrainingById(trainingId);
-        log.info("Response: {}", trainingModel);
-        return ResponseEntity.ok(trainingModel);
-    }
-    @PutMapping("/{trainingId}")
-    public ResponseEntity<TrainingModel> updateTraining(@PathVariable Long trainingId, @RequestBody TrainingModel trainingModel) {
-        log.info("Endpoint called: PUT /trainings/{}", trainingId);
-        TrainingModel updatedTraining = trainingService.updateTraining(trainingId, trainingModel);
-        log.info("Response: {}", updatedTraining);
-        return ResponseEntity.ok(updatedTraining);
-    }
-
-    @DeleteMapping("/{trainingId}")
-    public ResponseEntity<String> deleteTraining(@PathVariable Long trainingId) {
-        log.info("Endpoint called: DELETE /trainings/{}", trainingId);
-        trainingService.deleteTraining(trainingId);
-        log.info("Response: deleted successfully");
-        return new ResponseEntity<>("deleted successfully", HttpStatus.OK);
-    }
-
     @PostMapping
     public ResponseEntity<String> saveTraining(@Valid @RequestBody TrainingRequest training) throws IOException {
         log.info("Endpoint called: POST /training, Request: {}", training);

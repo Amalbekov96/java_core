@@ -2,8 +2,10 @@ package com.javacore.task.controllers;
 
 import com.javacore.task.models.TrainerModel;
 import com.javacore.task.models.request.TrainerTrainingsRequest;
+import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TrainerInfoResponse;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TrainerTrainingInfoResponse;
+import com.javacore.task.models.response.TrainerUpdateResponse;
 import com.javacore.task.services.TrainerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -32,37 +34,14 @@ public class TrainerController {
         return ResponseEntity.ok(trainerModel);
     }
 
-    @PostMapping
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<TrainerModel> createTrainer(@RequestBody TrainerModel trainerModel) {
-        log.info("Endpoint called: POST /trainers, Request: {}", trainerModel);
-        TrainerModel createdTrainer = trainerService.createTrainer(trainerModel);
-        log.info("Response: {}", createdTrainer);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTrainer);
-    }
-
-    @PutMapping("/{trainerId}")
-    public ResponseEntity<TrainerModel> updateTrainer(@PathVariable Long trainerId, @RequestBody TrainerModel trainerModel) {
-        log.info("Endpoint called: PUT /trainers/{}", trainerId);
-        TrainerModel updatedTrainer = trainerService.updateTrainer(trainerId, trainerModel);
+    @PutMapping
+    public ResponseEntity<TrainerUpdateResponse> updateTrainer(@Valid @RequestBody TrainerUpdateRequest request) {
+        log.info("Endpoint called: PUT /trainers Request: {}", request);
+        TrainerUpdateResponse updatedTrainer = trainerService.updateTrainer(request);
         log.info("Response: {}", updatedTrainer);
         return ResponseEntity.ok(updatedTrainer);
     }
 
-    @PostMapping("/{trainerId}")
-    public ResponseEntity<String> updateLogin(@PathVariable long trainerId, @RequestParam("password") String password, @RequestParam("newPassword") String newPassword) {
-        log.info("Endpoint called: POST /trainers/{}", trainerId);
-        trainerService.changeTrainerPassword(trainerId, password, newPassword);
-        return new ResponseEntity<>("password successfully updated!", HttpStatus.OK);
-    }
-
-    @DeleteMapping("/{trainerId}")
-    public ResponseEntity<String> deleteTrainer(@PathVariable("trainerId") long trainerId) {
-        log.info("Endpoint called: DELETE /trainer/{}", trainerId);
-        trainerService.deleteTrainer(trainerId);
-        log.info("Response: deleted successfully");
-        return new ResponseEntity<>("deleted successfully", HttpStatus.OK);
-    }
     @GetMapping
     public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("q") String username) {
         log.info("Endpoint called: GET /trainer, Request: q={}", username);
@@ -71,18 +50,18 @@ public class TrainerController {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @PatchMapping("/{trainerId}")
-    public ResponseEntity<String> updateTrainerStatus(@PathVariable("trainerId") long trainerId, @RequestParam("status") boolean status) {
-        log.info("Endpoint called: PATCH /trainer/{}, Request: choice={}", trainerId, status);
-        String result = trainerService.updateTrainerStatus(status, trainerId);
+    @PatchMapping
+    public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") boolean status) {
+        log.info("Endpoint called: PATCH /trainer?{}, Request: choice={}", username, status);
+        String result = trainerService.updateTrainerStatus(status, username);
         log.info("Response: {}", result);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
     @GetMapping("/trainer-trainings")
-    public ResponseEntity<List<TrainingInfoResponse>> getTrainerTrainingsList(@Valid @RequestBody TrainerTrainingsRequest request) {
+    public ResponseEntity<List<TrainerTrainingInfoResponse>> getTrainerTrainingsList(@Valid @RequestBody TrainerTrainingsRequest request) {
         log.info("Endpoint called: POST /training/trainerTrainings, Request: {}", request);
-        List<TrainingInfoResponse> responses = trainerService.getTrainerTrainingsByCriteria(request);
+        List<TrainerTrainingInfoResponse> responses = trainerService.getTrainerTrainingsByCriteria(request);
         log.info("Response: {}", responses);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }

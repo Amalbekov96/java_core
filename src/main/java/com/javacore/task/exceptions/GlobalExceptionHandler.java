@@ -35,6 +35,13 @@ public class GlobalExceptionHandler {
         errors.put(MESSAGE_KEY,exception.getMessage());
         return errors;
     }
+    @ExceptionHandler(AlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public Map<String,String> handleAlreadyExistsException(@jakarta.validation.constraints.NotNull AlreadyExistsException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put(MESSAGE_KEY,exception.getMessage());
+        return errors;
+    }
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<String> handleApiException(ApiException e) {
         log.error("An error with code {} occurred: {}", e.getErrorCode(), e.getMessage());
