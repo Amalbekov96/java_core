@@ -28,6 +28,7 @@ public class TraineeController {
     private final TraineeService traineeService;
 
     @GetMapping("/{traineeId}")
+    @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeModel> getTraineeById(@PathVariable Long traineeId) {
         log.info("Endpoint called: GET /trainees/{}", traineeId);
         TraineeModel traineeModel = traineeService.getTraineeById(traineeId);
@@ -36,6 +37,7 @@ public class TraineeController {
     }
 
     @PutMapping
+    @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeProfileUpdateResponse> updateTrainee(@Valid @RequestBody TraineeUpdateRequest request) {
         log.info("Endpoint called: PUT /trainees Request: {}", request);
         TraineeProfileUpdateResponse updatedTrainee = traineeService.updateTrainee(request);
@@ -52,6 +54,7 @@ public class TraineeController {
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeInfoResponse> getTraineeProfile(@RequestParam("q") String username) {
         log.info("Endpoint called: GET /trainees, Request: q={}", username);
         TraineeInfoResponse traineeGetByNameResponse = traineeService.findTraineeProfileByUsername(username);

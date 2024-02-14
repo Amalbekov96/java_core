@@ -23,6 +23,8 @@ public class TrainingServiceImpl implements TrainingService {
     private final TrainingRepository trainingRepository;
     private final TrainerRepository trainerRepository;
     private final TraineeRepository traineeRepository;
+
+    @Transactional
     @Override
     public void saveTraining(TrainingRequest training) {
         Trainee trainee = traineeRepository.findTraineeByUserUsername(training.traineeUsername()).orElseThrow(

@@ -44,6 +44,7 @@ public class TrainerServiceImpl implements TrainerService {
         }
     }
 
+    @Transactional
     @Override
     public TrainerUpdateResponse updateTrainer(TrainerUpdateRequest request) {
         try {

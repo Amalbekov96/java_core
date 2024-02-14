@@ -5,15 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.HashMap;
 import java.util.Map;
 
 
-@ControllerAdvice
+@RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
     private static final String MESSAGE_KEY = "message";
@@ -42,6 +42,19 @@ public class GlobalExceptionHandler {
         errors.put(MESSAGE_KEY,exception.getMessage());
         return errors;
     }
+    @ExceptionHandler(UnAuthorizedException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String,String> unAuthException(@jakarta.validation.constraints.NotNull UnAuthorizedException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put(MESSAGE_KEY,exception.getMessage());
+        return errors;
+    }@ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String,String> illegalException(@jakarta.validation.constraints.NotNull IllegalArgumentException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put(MESSAGE_KEY,exception.getMessage());
+        return errors;
+    }
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<String> handleApiException(ApiException e) {
         log.error("An error with code {} occurred: {}", e.getErrorCode(), e.getMessage());
@@ -58,4 +71,8 @@ public class GlobalExceptionHandler {
         log.error("USER not found: {}", e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("user with such name not found");
     }
+
+
+
+
 }

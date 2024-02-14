@@ -18,13 +18,18 @@ import com.javacore.task.models.response.TrainersListResponse;
 import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
+import com.javacore.task.repositories.TrainingRepository;
 import com.javacore.task.services.TraineeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -36,7 +41,8 @@ public class TraineeServiceImpl implements TraineeService {
     private final TraineeRepository traineeRepository;
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
-    private final TrainerRepository trainerDao;
+    private final TrainerRepository trainerRepository;
+    private final TrainingRepository trainingRepository;
 
     @Override
     public TraineeModel getTraineeById(Long traineeId) {
@@ -49,6 +55,7 @@ public class TraineeServiceImpl implements TraineeService {
         }
     }
 
+    @Transactional
     @Override
     public TraineeProfileUpdateResponse updateTrainee(TraineeUpdateRequest request) {
         try {
@@ -68,6 +75,7 @@ public class TraineeServiceImpl implements TraineeService {
         }
     }
 
+    @Transactional
     @Override
     public void deleteTrainee(String username) {
         try {
@@ -92,6 +100,7 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
 
+    @Transactional
     @Override
     public String updateTraineeStatus(boolean status, String username) {
 
@@ -114,6 +123,7 @@ public class TraineeServiceImpl implements TraineeService {
             }
         }
 
+    @Transactional
     @Override
     public List<TrainersListResponse> updateTraineeTrainersList(String username, List<String> trainersUsernames) {
          Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
@@ -121,12 +131,38 @@ public class TraineeServiceImpl implements TraineeService {
              return new UserNotFoundException("Trainee not found");
          });
          List<Trainer> trainers = traineeRepository.getNotAssignedTrainers(trainee.getUser().getUsername());
-         List<Trainer> addedTrainers= trainerDao.findTrainersByUserUserName(trainersUsernames);
-         trainers.addAll(addedTrainers);
-         trainee.setTrainers(trainers);
+         List<Trainer> addedTrainers= trainerRepository.findTrainersByUserUserName(trainersUsernames);
+
+        boolean isTrainerListValid = addedTrainers.stream()
+                .allMatch(trainer -> trainers.stream()
+                        .anyMatch(existingTrainer -> existingTrainer.getUser().getUsername().equals(trainer.getUser().getUsername())));
+        if(isTrainerListValid){
+            trainee.getTrainers().addAll(addedTrainers);
+        }
+
+        for (Trainer trainer : addedTrainers) {
+            Training newTraining = Training.builder()
+                    .trainee(trainee)
+                    .trainer(trainer)
+                    .trainingType(trainer.getSpecialization())
+                    .trainingName(String.format("Training with %s and %s", trainer.getUser().getUsername(), trainee.getUser().getUsername()))
+                    .trainingDuration(0)
+                    .trainingDate(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .build();
+            trainingRepository.save(newTraining);
+            trainee.getTrainings().add(newTraining);
+        }
          traineeRepository.save(trainee);
+
          log.info("Updated Trainer list for Trainee with username : {}", username);
-         return traineeMapper.mapTraineesTrainersToDto(trainers);
+
+         return addedTrainers.stream()
+                 .map(trainer -> new TrainersListResponse(
+                         trainer.getUser().getUsername(),
+                         trainer.getUser().getFirstName(),
+                         trainer.getUser().getLastName(),
+                         trainer.getSpecialization().getTrainingType().name()
+                 )).distinct().collect(Collectors.toList());
         }
 
     @Override

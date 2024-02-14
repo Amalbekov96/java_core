@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -37,7 +36,6 @@ public class AuthenticationController {
         return authenticationService.signIn(request);
     }
     @PutMapping
-    @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
     public ResponseEntity<String> updateLogin(@RequestParam String username, @RequestParam("password") String password, @RequestParam("newPassword") String newPassword) {
         log.info("Endpoint called: POST /trainers?{}", username);
         authenticationService.changePassword(username, password, newPassword);

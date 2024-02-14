@@ -5,6 +5,7 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.UserRole;
+import com.javacore.task.exceptions.BadCredentialsException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.models.request.TraineeRequest;
@@ -21,14 +22,17 @@ import com.javacore.task.services.ProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
+
     private final UserRepository userRepository;
     private final TrainingTypeRepository trainingTypeRepository;
     private final TraineeRepository traineeRepository;
@@ -36,6 +40,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ProfileService profileService;
+
+    @Transactional
     @Override
     public SignUpResponse traineeSignUp(TraineeRequest request) {
         log.info("Trainee sign up request: {}", request);
@@ -73,6 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
     }
 
+    @Transactional
     @Override
     public SignUpResponse trainerSignUp(TrainerRequest request) {
 
@@ -110,8 +117,16 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .role(user.getRole())
                 .build();
     }
+
+    @Transactional
     @Override
     public void changePassword(String username, String password, String newPassword) {
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (!auth.getName().equals(username)) {
+            throw new BadCredentialsException("You can change only your password");
+        }
         User user = userRepository.findUserByUsername(username).orElseThrow(()-> {
             log.warn("Response: User not found");
             return new UserNotFoundException(String.format("User with username: %s not found", username));
