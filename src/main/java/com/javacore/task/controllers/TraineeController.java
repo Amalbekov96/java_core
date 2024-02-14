@@ -88,7 +88,7 @@ public class TraineeController {
     }
 
     @GetMapping("/trainee-trainings")
-    @PreAuthorize("hasAuthority('TRAINEE')")
+    @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
     public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
         log.info("Endpoint called: POST /training/traineeTrainings, Request: {}", request);
         List<TraineeTrainingInfoResponse> responses = traineeService.getTraineeTrainingsByCriteria(request);

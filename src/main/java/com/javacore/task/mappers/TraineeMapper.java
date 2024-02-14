@@ -56,11 +56,6 @@ public class TraineeMapper {
 
     public Trainee update(TraineeUpdateRequest request, Trainee trainee) {
         if (request != null && trainee != null) {
-            if(!userRepository.existsByUsername(request.userName())) {
-                trainee.getUser().setUsername(request.userName());
-            }else {
-                throw new AlreadyExistsException("Username is busy!");
-            }
             trainee.setAddress(request.address());
             trainee.setDateOfBirth(request.dateOfBirth());
             trainee.getUser().setFirstName(request.firstName());

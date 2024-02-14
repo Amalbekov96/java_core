@@ -3,13 +3,11 @@ package com.javacore.task.mappers;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
-import com.javacore.task.exceptions.AlreadyExistsException;
 import com.javacore.task.models.*;
 import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TraineesListResponse;
 import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
-import com.javacore.task.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +18,6 @@ import java.util.stream.Collectors;
 public class TrainerMapper {
 
     private final TrainingTypeMapper trainingTypeMapper;
-    private final UserRepository userRepository;
     private final UserMapper userMapper;
 
     public TrainerModel trainerToTrainerModel(Trainer trainer) {
@@ -59,11 +56,6 @@ public class TrainerMapper {
 
     public Trainer update(TrainerUpdateRequest request, Trainer trainer) {
         if (request != null && trainer != null) {
-            if(!userRepository.existsByUsername(request.userName())) {
-                trainer.getUser().setUsername(request.userName());
-            }else {
-                throw new AlreadyExistsException("Username is busy!");
-            }
             trainer.getUser().setFirstName(request.firstName());
             trainer.getUser().setLastName(request.lastName());
             trainer.getUser().setIsActive(request.isActive());
