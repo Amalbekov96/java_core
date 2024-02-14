@@ -17,12 +17,12 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 @Transactional
-public class TraineeControllerTest {
+class TraineeControllerTest {
     private static final String BASE_URL = "http://localhost:8080";
     private SignInResponse signInResponse;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         io.restassured.RestAssured.port = 8080;
         SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
 
@@ -39,7 +39,7 @@ public class TraineeControllerTest {
 
     }
     @Test
-    public void testDeleteTrainee() {
+    void testDeleteTrainee() {
 
         String username = "Eldiyar.Toktomamatov";
 
@@ -54,7 +54,7 @@ public class TraineeControllerTest {
 
 
     @Test
-    public void testUpdateTrainee() {
+    void testUpdateTrainee() {
 
         TraineeUpdateRequest requestBody =
                 new TraineeUpdateRequest("John.Doe",
@@ -83,7 +83,7 @@ public class TraineeControllerTest {
     }
 
     @Test
-    public void testGetTraineeProfile() {
+    void testGetTraineeProfile() {
 
         String username = "John.Doe";
 
@@ -102,7 +102,7 @@ public class TraineeControllerTest {
         assertThat(response.getAddress(), notNullValue());
     }
     @Test
-    public void testUpdateTraineeStatus() {
+    void testUpdateTraineeStatus() {
         boolean choice = false;
        String username = "John.Doe";
 
@@ -118,7 +118,7 @@ public class TraineeControllerTest {
 
 
     @Test
-    public void testGetNotAssignedTrainersForTrainee() {
+    void testGetNotAssignedTrainersForTrainee() {
 
         String username = "John.Doe";
 
@@ -133,7 +133,7 @@ public class TraineeControllerTest {
     }
 
     @Test
-    public void testUpdateTraineeTrainersList() {
+    void testUpdateTraineeTrainersList() {
         String username = "John.Doe";
         List<String> trainersUsernames = Arrays.asList("Kushtar.Amalbekov","Eulan.Ibraimov");
 
@@ -151,7 +151,7 @@ public class TraineeControllerTest {
     }
 
     @Test
-    public void testGetTraineeTrainingsList() {
+    void testGetTraineeTrainingsList() {
         String username = "Kushtar.Amalbekov_2";
         TraineeTrainingsRequest requestBody = new TraineeTrainingsRequest(
                 username,

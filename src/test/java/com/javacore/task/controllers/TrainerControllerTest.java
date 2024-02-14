@@ -15,12 +15,12 @@ import java.time.LocalDate;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-public class TrainerControllerTest {
+class TrainerControllerTest {
     private static final String BASE_URL = "http://localhost:8080";
     private SignInResponse signInResponse;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
 
         io.restassured.RestAssured.port = 8080;
         SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
@@ -39,7 +39,7 @@ public class TrainerControllerTest {
     }
 
     @Test
-    public void testGetTrainerById() {
+    void testGetTrainerById() {
 
         long trainerId = 2;
 
@@ -56,7 +56,7 @@ public class TrainerControllerTest {
     }
 
     @Test
-    public void testUpdateTrainer() {
+    void testUpdateTrainer() {
         TrainerUpdateRequest requestBody =
                 new TrainerUpdateRequest("Aijamal.Asangazieva.2",
                         "Alanushka", "Mamanovichov",false);
@@ -79,7 +79,7 @@ public class TrainerControllerTest {
     }
 
     @Test
-    public void testGetTraineeProfile() {
+    void testGetTraineeProfile() {
 
         String username = "Aijamal.Asangazieva.2";
 
@@ -99,7 +99,7 @@ public class TrainerControllerTest {
     }
 
     @Test
-    public void testUpdateTraineeStatus() {
+    void testUpdateTraineeStatus() {
 
         String username = "Aijamal.Asangazieva.2";
         boolean choice = false;
@@ -114,7 +114,7 @@ public class TrainerControllerTest {
     }
 
     @Test
-    public void testGetTrainerTrainingsList(){
+    void testGetTrainerTrainingsList(){
         TrainerTrainingsRequest requestBody = new TrainerTrainingsRequest(
                 "Kushtar.Amalbekov",
                 java.sql.Date.valueOf(LocalDate.of(2023, 10, 11)),

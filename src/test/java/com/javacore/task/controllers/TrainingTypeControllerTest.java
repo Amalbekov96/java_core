@@ -8,12 +8,12 @@ import org.junit.jupiter.api.Test;
 
 import static io.restassured.RestAssured.given;
 
-public class TrainingTypeControllerTest {
+class TrainingTypeControllerTest {
     private static final String BASE_URL = "http://localhost:8080";
     private SignInResponse signInResponse;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         io.restassured.RestAssured.port = 8080;
         SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
 
@@ -30,7 +30,7 @@ public class TrainingTypeControllerTest {
 
     }
     @Test
-    public void testGetTrainingTypes() {
+    void testGetTrainingTypes() {
         given()
                 .header("Authorization", "Bearer " + signInResponse.token())
                 .contentType(ContentType.JSON)

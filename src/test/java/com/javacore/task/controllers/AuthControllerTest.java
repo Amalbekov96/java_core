@@ -27,19 +27,19 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 
 @Transactional
-public class AuthControllerTest {
+class AuthControllerTest {
 
     @Mock
     private UserRepository userRepository;
     @Mock
     private PasswordEncoder passwordEncoder;
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         RestAssured.port = 8080;
     }
 
     @Test
-    public void testTraineeSignUp() {
+    void testTraineeSignUp() {
         TraineeRequest traineeRequest = new TraineeRequest("John",
                 "Doe",new Date(), "123 Main St");
 
@@ -62,7 +62,7 @@ public class AuthControllerTest {
 
 
     @Test
-    public void testTrainerSignUp() {
+    void testTrainerSignUp() {
         TrainingType trainingType = TrainingType.builder()
                 .id(2L)
                 .trainingType(TrainingTypes.FITNESS)
@@ -88,7 +88,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testSignIn() {
+    void testSignIn() {
         SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
 
         SignInResponse signInResponse = given()
@@ -108,7 +108,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testUpdateLogin() {
+    void testUpdateLogin() {
         String username = "Kushtar.Amalbekov";
         String password = "ziJ4jlTA22";
         String newPassword = "newPassword";
