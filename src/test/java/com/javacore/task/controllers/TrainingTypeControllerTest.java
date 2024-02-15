@@ -15,7 +15,7 @@ class TrainingTypeControllerTest {
     @BeforeEach
     void setUp() {
         io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
+        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "3uNjYRTMOd");
 
         signInResponse = given()
                 .contentType(ContentType.JSON)

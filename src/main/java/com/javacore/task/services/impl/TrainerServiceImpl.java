@@ -47,18 +47,16 @@ public class TrainerServiceImpl implements TrainerService {
     @Transactional
     @Override
     public TrainerUpdateResponse updateTrainer(TrainerUpdateRequest request) {
-        try {
+
             Trainer existingTrainer = trainerRepository.findByUserUsername(request.userName()).orElseThrow(
                     () -> new UserNotFoundException("Trainer not found"));
 
            Trainer trainer =  trainerMapper.update(request, existingTrainer);
             trainerRepository.save(trainer);
             return trainerMapper.trainerToTrainerUpdateResponse(trainer);
-        } catch (Exception e) {
-            log.error("Error updating Trainer", e);
-            throw new ApiException("Error updating Trainer", ErrorCode.TRAINER_NOT_FOUND);
-        }
+
     }
+
 
     @Override
     public TrainerInfoResponse findTrainerProfileByUsername(String username) {

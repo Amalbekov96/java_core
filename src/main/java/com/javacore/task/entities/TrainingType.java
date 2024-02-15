@@ -21,4 +21,8 @@ public class TrainingType {
 
     @Enumerated(EnumType.STRING)
     private TrainingTypes trainingType;
+
+    public TrainingType(TrainingTypes trainingType) {
+        this.trainingType = trainingType;
+    }
 }

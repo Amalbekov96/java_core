@@ -6,11 +6,12 @@ import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class TrainingMapper {
 

@@ -56,6 +56,7 @@ public class TrainerMapper {
 
     public Trainer update(TrainerUpdateRequest request, Trainer trainer) {
         if (request != null && trainer != null) {
+            trainer.getUser().setUsername(request.userName());
             trainer.getUser().setFirstName(request.firstName());
             trainer.getUser().setLastName(request.lastName());
             trainer.getUser().setIsActive(request.isActive());

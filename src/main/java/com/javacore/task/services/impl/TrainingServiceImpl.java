@@ -14,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -38,6 +40,9 @@ public class TrainingServiceImpl implements TrainingService {
                     log.warn("Response: Trainer not found");
                     return new UserNotFoundException("Trainer not found");
                 });
+        if (trainee.getTrainers()==null){
+            trainee.setTrainers(new ArrayList<>());
+        }
         trainee.getTrainers().add(trainer);
         Training savedtraining = Training.builder()
                 .trainingName(training.trainingName())

@@ -184,5 +184,7 @@ public class TraineeServiceImpl implements TraineeService {
             log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}",request, trainings);
             return trainingMapper.mapTraineeTrainingsToDto(trainings);
         }
+
+
     }
 

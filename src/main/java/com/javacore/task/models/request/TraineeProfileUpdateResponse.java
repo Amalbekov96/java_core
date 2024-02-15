@@ -5,11 +5,10 @@ import lombok.*;
 
 import java.util.Date;
 import java.util.List;
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
+@Data
 public class TraineeProfileUpdateResponse {
     private String username;
     private String firstName;

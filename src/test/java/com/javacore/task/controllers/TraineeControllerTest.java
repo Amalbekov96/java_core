@@ -57,7 +57,7 @@ class TraineeControllerTest {
     void testUpdateTrainee() {
 
         TraineeUpdateRequest requestBody =
-                new TraineeUpdateRequest("John.Doe",
+                new TraineeUpdateRequest("Kanysh.Abdyrakmanova",
                         "Alanushka", "Mamanovichov",
                         new Date(),
                         "123 Main St",true);
@@ -85,7 +85,7 @@ class TraineeControllerTest {
     @Test
     void testGetTraineeProfile() {
 
-        String username = "John.Doe";
+        String username = "Kanysh.Abdyrakmanova";
 
         TraineeInfoResponse response = given()
                 .header("Authorization", "Bearer " + signInResponse.token())
@@ -104,7 +104,7 @@ class TraineeControllerTest {
     @Test
     void testUpdateTraineeStatus() {
         boolean choice = false;
-       String username = "John.Doe";
+       String username = "Kanysh.Abdyrakmanova";
 
         given()
                 .header("Authorization", "Bearer " + signInResponse.token())
@@ -120,7 +120,7 @@ class TraineeControllerTest {
     @Test
     void testGetNotAssignedTrainersForTrainee() {
 
-        String username = "John.Doe";
+        String username = "Kanysh.Abdyrakmanova";
 
         given()
                 .header("Authorization", "Bearer " + signInResponse.token())
@@ -134,8 +134,8 @@ class TraineeControllerTest {
 
     @Test
     void testUpdateTraineeTrainersList() {
-        String username = "John.Doe";
-        List<String> trainersUsernames = Arrays.asList("Kushtar.Amalbekov","Eulan.Ibraimov");
+        String username = "Kanysh.Abdyrakmanova";
+        List<String> trainersUsernames = Arrays.asList("Kushtar.Amalbekov","Aiperi.Adylova");
 
         given()
                 .header("Authorization", "Bearer " + signInResponse.token() )
@@ -152,7 +152,7 @@ class TraineeControllerTest {
 
     @Test
     void testGetTraineeTrainingsList() {
-        String username = "Kushtar.Amalbekov_2";
+        String username = "Kushtar.Amalbekov";
         TraineeTrainingsRequest requestBody = new TraineeTrainingsRequest(
                 username,
                 "Kushtar.Amalbekov",
@@ -172,4 +172,5 @@ class TraineeControllerTest {
                 .extract().asString();
 
     }
+
 }

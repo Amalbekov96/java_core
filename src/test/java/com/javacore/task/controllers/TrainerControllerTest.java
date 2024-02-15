@@ -23,7 +23,7 @@ class TrainerControllerTest {
     void setUp() {
 
         io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
+        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "3uNjYRTMOd");
 
         signInResponse = given()
                 .contentType(ContentType.JSON)
@@ -58,8 +58,8 @@ class TrainerControllerTest {
     @Test
     void testUpdateTrainer() {
         TrainerUpdateRequest requestBody =
-                new TrainerUpdateRequest("Aijamal.Asangazieva.2",
-                        "Alanushka", "Mamanovichov",false);
+                new TrainerUpdateRequest("Kushtar.Amalbekov",
+                        "Alanush", "Mamanovichov",false);
 
        TrainerInfoResponse trainerInfoResponse =  given()
                .header("Authorization", "Bearer " + signInResponse.token())
@@ -73,7 +73,7 @@ class TrainerControllerTest {
                 .extract()
                 .as(TrainerInfoResponse.class);
 
-       assertThat(trainerInfoResponse.getFirstName(), equalTo("Alanushka"));
+       assertThat(trainerInfoResponse.getFirstName(), equalTo("Alanush"));
        assertThat(trainerInfoResponse.getLastName(), equalTo("Mamanovichov"));
 
     }
@@ -81,7 +81,7 @@ class TrainerControllerTest {
     @Test
     void testGetTraineeProfile() {
 
-        String username = "Aijamal.Asangazieva.2";
+        String username = "Aiperi.Adylova";
 
        TrainerInfoResponse trainerInfoResponse =  given()
                .header("Authorization", "Bearer " + signInResponse.token())
@@ -92,8 +92,8 @@ class TrainerControllerTest {
                 .extract()
                 .as(TrainerInfoResponse.class);
 
-         assertThat(trainerInfoResponse.getFirstName(), equalTo("Aijamal"));
-         assertThat(trainerInfoResponse.getLastName(), equalTo("Asangazieva"));
+         assertThat(trainerInfoResponse.getFirstName(), equalTo("Aiperi"));
+         assertThat(trainerInfoResponse.getLastName(), equalTo("Adylova"));
 
 
     }

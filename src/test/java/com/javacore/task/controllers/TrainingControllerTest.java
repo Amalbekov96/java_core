@@ -20,7 +20,7 @@ class TrainingControllerTest {
     @BeforeEach
     void setUp() {
         io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
+        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "3uNjYRTMOd");
 
         signInResponse = given()
                 .contentType(ContentType.JSON)
@@ -37,8 +37,8 @@ class TrainingControllerTest {
     @Test
     void testCreateTraining() {
         TrainingRequest requestBody = new TrainingRequest(
-                "Kanysh.Abdyrakmanova",
-                "Eulan.Ibraimov",
+                "Kairat.Uzenov",
+                "Kushtar.Amalbekov",
                 "FITNESS",
                 new Date(),
                 2
