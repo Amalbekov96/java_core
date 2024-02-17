@@ -78,15 +78,12 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     @Override
     public void deleteTrainee(String username) {
-        try {
+
             Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(
                     () -> new UserNotFoundException(String.format("Trainee with username: %s not found", username)));
             traineeRepository.deleteById(trainee.getTraineeId());
             log.info("Trainee deleted with id: {}", trainee.getTraineeId());
-        } catch (Exception e) {
-            log.error("Error deleting Trainee", e);
-            throw new ApiException("Error deleting Trainee", ErrorCode.TRAINER_NOT_FOUND);
-        }
+
     }
 
         @Override

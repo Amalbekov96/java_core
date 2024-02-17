@@ -52,8 +52,8 @@ public class TrainerServiceImpl implements TrainerService {
                     () -> new UserNotFoundException("Trainer not found"));
 
            Trainer trainer =  trainerMapper.update(request, existingTrainer);
-            trainerRepository.save(trainer);
-            return trainerMapper.trainerToTrainerUpdateResponse(trainer);
+        Trainer savedTrainer =  trainerRepository.save(trainer);
+            return trainerMapper.trainerToTrainerUpdateResponse(savedTrainer);
 
     }
 

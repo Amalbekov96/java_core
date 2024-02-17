@@ -5,7 +5,9 @@ import com.javacore.task.models.request.TrainerTrainingsRequest;
 import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.SignInResponse;
 import com.javacore.task.models.response.TrainerInfoResponse;
+import com.javacore.task.models.response.TrainerUpdateResponse;
 import io.restassured.http.ContentType;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-
+@Transactional
 class TrainerControllerTest {
     private static final String BASE_URL = "http://localhost:8080";
     private SignInResponse signInResponse;
@@ -23,7 +25,7 @@ class TrainerControllerTest {
     void setUp() {
 
         io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "3uNjYRTMOd");
+        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
 
         signInResponse = given()
                 .contentType(ContentType.JSON)
@@ -59,9 +61,9 @@ class TrainerControllerTest {
     void testUpdateTrainer() {
         TrainerUpdateRequest requestBody =
                 new TrainerUpdateRequest("Kushtar.Amalbekov",
-                        "Alanush", "Mamanovichov",false);
+                        "Alanush", "Mamanovichov",true);
 
-       TrainerInfoResponse trainerInfoResponse =  given()
+       TrainerUpdateResponse trainerInfoResponse =  given()
                .header("Authorization", "Bearer " + signInResponse.token())
                 .contentType(ContentType.JSON)
                 .body(requestBody)
@@ -71,7 +73,7 @@ class TrainerControllerTest {
                 .log().all()
                 .statusCode(200)
                 .extract()
-                .as(TrainerInfoResponse.class);
+                .as(TrainerUpdateResponse.class);
 
        assertThat(trainerInfoResponse.getFirstName(), equalTo("Alanush"));
        assertThat(trainerInfoResponse.getLastName(), equalTo("Mamanovichov"));
@@ -99,9 +101,9 @@ class TrainerControllerTest {
     }
 
     @Test
-    void testUpdateTraineeStatus() {
+    void testUpdateTrainerStatus() {
 
-        String username = "Aijamal.Asangazieva.2";
+        String username = "Aidana.Amalbekova";
         boolean choice = false;
 
         given()
@@ -119,14 +121,14 @@ class TrainerControllerTest {
                 "Kushtar.Amalbekov",
                 java.sql.Date.valueOf(LocalDate.of(2023, 10, 11)),
                 java.sql.Date.valueOf(LocalDate.of(2024, 2, 11)),
-                "Aliya.Rahman.2"
+                "Kanysh.Abdyrakmanova"
         );
         given()
                 .header("Authorization", "Bearer " + signInResponse.token())
                 .contentType(ContentType.JSON)
                 .body(requestBody)
                 .when()
-                .post(BASE_URL + "/trainers/trainer/trainings?username=" + "Kushtar.Amalbekov")
+                .get(BASE_URL + "/trainers/trainer-trainings")
                 .then()
                 .log().all()
                 .statusCode(200)

@@ -15,19 +15,18 @@ class TrainingTypeControllerTest {
     @BeforeEach
     void setUp() {
         io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "3uNjYRTMOd");
+        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
 
         signInResponse = given()
                 .contentType(ContentType.JSON)
                 .body(signInRequest)
                 .when()
-                .post("/api/v1/auth/sign-in")
+                .post(BASE_URL+"/api/v1/auth/sign-in")
                 .then()
                 .log().all()
                 .statusCode(200)
                 .extract()
                 .as(SignInResponse.class);
-
     }
     @Test
     void testGetTrainingTypes() {

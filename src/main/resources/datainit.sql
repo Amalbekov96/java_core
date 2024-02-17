@@ -22,10 +22,16 @@ VALUES ('Kanysh', 'Abdyrakmanova', 'Kanysh.Abdyrakmanova', '$2a$12$Ki9eoKu3WrnGu
 INSERT INTO users (first_name, last_name, username, password, is_active, role)
 VALUES ('Kairat', 'Uzenov', 'Kairat.Uzenov', '$2a$12$Ki9eoKu3WrnGuCk0n5shV.zaNmjGBiZ06P7Rud7UGCg.CJF88q9JW
 ', true, 'TRAINEE');
+INSERT INTO users (first_name, last_name, username, password, is_active, role)
+VALUES ('Aidana', 'Amalbekova', 'Aidana.Amalbekova', '$2a$12$Ki9eoKu3WrnGuCk0n5shV.zaNmjGBiZ06P7Rud7UGCg.CJF88q9JW
+', true, 'TRAINER');
 
 INSERT INTO trainer (specialization_id, user_id)
 VALUES ((SELECT id FROM training_type WHERE training_type = 'FITNESS'),
         (SELECT user_id FROM Users WHERE username = 'Kushtar.Amalbekov'));
+INSERT INTO trainer (specialization_id, user_id)
+VALUES ((SELECT id FROM training_type WHERE training_type = 'FITNESS'),
+        (SELECT user_id FROM Users WHERE username = 'Aidana.Amalbekova'));
 INSERT INTO trainer (specialization_id, user_id)
 VALUES ((SELECT id FROM training_type WHERE training_type = 'YOGA'),
         (SELECT user_id FROM Users WHERE username = 'Aiperi.Adylova'));
@@ -36,4 +42,3 @@ INSERT INTO trainee (date_of_birth, address, user_id)
 VALUES (CURRENT_DATE, '456 Avenue, Town', (SELECT user_id FROM Users WHERE username = 'Eldiyar.Toktomamatov'));
 INSERT INTO trainee (date_of_birth, address, user_id)
 VALUES (CURRENT_DATE, '456 Avenue, Town', (SELECT user_id FROM Users WHERE username = 'Kairat.Uzenov'));
-

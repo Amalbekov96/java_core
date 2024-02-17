@@ -26,7 +26,7 @@ public class Trainee {
     @Column(name = "ADDRESS")
     private String address;
 
-    @OneToOne
+    @OneToOne(cascade =CascadeType.ALL)
     @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
     private User user;
 

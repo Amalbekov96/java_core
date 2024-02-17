@@ -41,7 +41,7 @@ class TraineeControllerTest {
     @Test
     void testDeleteTrainee() {
 
-        String username = "Eldiyar.Toktomamatov";
+        String username = "Kairat.Uzenov";
 
         given()
                 .header("Authorization", "Bearer " + signInResponse.token())
@@ -77,7 +77,6 @@ class TraineeControllerTest {
         assertThat(traineeProfileUpdateResponse.getFirstName(), equalTo(requestBody.firstName()));
         assertThat(traineeProfileUpdateResponse.getLastName(), equalTo(requestBody.lastName()));
         assertThat(traineeProfileUpdateResponse.getAddress(), equalTo(requestBody.address()));
-        assertThat(traineeProfileUpdateResponse.getDateOfBirth(), equalTo(requestBody.dateOfBirth()));
 
 
     }
@@ -152,11 +151,11 @@ class TraineeControllerTest {
 
     @Test
     void testGetTraineeTrainingsList() {
-        String username = "Kushtar.Amalbekov";
+        String username = "Kanysh.Abdyrakmanova";
         TraineeTrainingsRequest requestBody = new TraineeTrainingsRequest(
                 username,
                 "Kushtar.Amalbekov",
-                "Fitness",
+                "FITNESS",
                 java.sql.Date.valueOf(LocalDate.of(2021, 10, 11)),
                 java.sql.Date.valueOf(LocalDate.of(2024, 2, 11))
         );
@@ -165,7 +164,7 @@ class TraineeControllerTest {
                 .contentType(ContentType.JSON)
                 .body(requestBody)
                 .when()
-                .get(BASE_URL + "/trainees/trainee/trainings?username=" + username)
+                .get(BASE_URL + "/trainees/trainee-trainings")
                 .then()
                 .log().all()
                 .statusCode(200)

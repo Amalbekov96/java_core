@@ -3,7 +3,7 @@ package com.javacore.task.models.request;
 import com.javacore.task.models.response.TrainersListResponse;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @Setter
@@ -14,7 +14,7 @@ import java.util.List;
 public class TraineeInfoResponse {
     private String firstName;
     private String lastName;
-    private LocalDate dateOfBirth;
+    private Date dateOfBirth;
     private String address;
     private boolean isActive;
     private List<TrainersListResponse> trainers;
