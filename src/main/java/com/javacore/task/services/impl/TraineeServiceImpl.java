@@ -3,7 +3,6 @@ package com.javacore.task.services.impl;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
-import com.javacore.task.entities.TrainingType;
 import com.javacore.task.enums.ErrorCode;
 import com.javacore.task.enums.TrainingTypes;
 import com.javacore.task.exceptions.ApiException;
@@ -11,10 +10,12 @@ import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.*;
+import com.javacore.task.models.request.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
+import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingRepository;
@@ -22,10 +23,13 @@ import com.javacore.task.services.TraineeService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -34,12 +38,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TraineeServiceImpl implements TraineeService {
 
-    private final PasswordEncoder passwordEncoder;
     private final TraineeRepository traineeRepository;
     private final TraineeMapper traineeMapper;
     private final TrainingMapper trainingMapper;
-    private final TrainingRepository trainingRepo;
-    private final TrainerRepository trainerDao;
+    private final TrainerRepository trainerRepository;
+    private final TrainingRepository trainingRepository;
 
     @Override
     public TraineeModel getTraineeById(Long traineeId) {
@@ -52,48 +55,35 @@ public class TraineeServiceImpl implements TraineeService {
         }
     }
 
+    @Transactional
     @Override
-    public TraineeModel createTrainee(TraineeModel traineeModel) {
+    public TraineeProfileUpdateResponse updateTrainee(TraineeUpdateRequest request) {
         try {
-            Trainee traineeEntity = traineeMapper.traineeModelToTrainee(traineeModel);
-            traineeEntity = traineeRepository.save(traineeEntity);
-            return traineeMapper.traineeToTraineeModel(traineeEntity);
-        } catch (Exception e) {
-            log.error("Error creating Trainee", e);
-            throw new ApiException("Error creating Trainee", ErrorCode.TRAINER_NOT_FOUND);
-        }
-    }
-
-    @Override
-    public TraineeModel updateTrainee(Long traineeId, TraineeModel traineeModel) {
-        try {
-            Trainee existingTrainee = traineeRepository.findById(traineeId).orElseThrow(
-                    () -> new UserNotFoundException(String.format("Trainee with id: %d not found", traineeId)));
+            Trainee existingTrainee = traineeRepository.findTraineeByUserUsername(request.userName()).orElseThrow(
+                    () -> new UserNotFoundException(String.format("Trainee with username: %s not found", request.userName())));
             if(existingTrainee == null) {
-                throw new ApiException("Trainee with ID " + traineeId + " not found", ErrorCode.TRAINER_NOT_FOUND);
+                throw new ApiException("Trainee with username " + request.userName() + " not found", ErrorCode.TRAINER_NOT_FOUND);
             }
 
-            traineeMapper.update(traineeModel, existingTrainee);
-            traineeRepository.save(existingTrainee);
+            Trainee trainee = traineeMapper.update(request, existingTrainee);
+            traineeRepository.save(trainee);
 
-            return traineeMapper.traineeToTraineeModel(existingTrainee);
+            return traineeMapper.traineeToTraineeResponse(existingTrainee);
         } catch (Exception e) {
             log.error("Error updating Trainee", e);
             throw new ApiException("Error updating Trainee", ErrorCode.TRAINER_NOT_FOUND);
         }
     }
 
+    @Transactional
     @Override
-    public void deleteTrainee(Long traineeId) {
-        try {
-            List<Training> trainings = trainingRepo.findByTrainerId(traineeId);
-            trainings.forEach(training -> trainingRepo.deleteById(training.getId()));
-            traineeRepository.deleteById(traineeId);
-            log.info("Trainee deleted with id: {}", traineeId);
-        } catch (Exception e) {
-            log.error("Error deleting Trainee", e);
-            throw new ApiException("Error deleting Trainee", ErrorCode.TRAINER_NOT_FOUND);
-        }
+    public void deleteTrainee(String username) {
+
+            Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(
+                    () -> new UserNotFoundException(String.format("Trainee with username: %s not found", username)));
+            traineeRepository.deleteById(trainee.getTraineeId());
+            log.info("Trainee deleted with id: {}", trainee.getTraineeId());
+
     }
 
         @Override
@@ -106,39 +96,31 @@ public class TraineeServiceImpl implements TraineeService {
             return traineeMapper.traineeInfoResponse(trainee);
         }
 
-        @Override
-        public void changeTraineePassword(long id,String password, String newPassword) {
-            Trainee trainee = traineeRepository.findById(id).orElseThrow(()-> {
-                log.warn("Response: Trainee not found");
-                return new UserNotFoundException(String.format("Trainee with id: %d not found", id));
-            });
-            if (!passwordEncoder.matches(password, trainee.getUser().getPassword())) {
-                throw new org.springframework.security.authentication.BadCredentialsException("wrong password");
-            }
-            traineeRepository.changeTraineePassword(id,passwordEncoder.encode(newPassword));
-            log.info("Changed password for Trainee with id: {}", id);
-        }
 
+    @Transactional
     @Override
-    public String updateTraineeStatus(boolean status, long traineeId) {
-            boolean isActive = traineeRepository.findById(traineeId).orElseThrow(()-> {
+    public String updateTraineeStatus(boolean status, String username) {
+
+           Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
                 log.warn("Response: Trainee not found");
-                return new UserNotFoundException(String.format("Trainee with id: %d not found", traineeId));
-            }).getUser().getIsActive();
-            if (status && !isActive){
-                traineeRepository.activateTrainee(traineeId);
-                log.info("Activated Trainee with id: {}", traineeId);
+                return new UserNotFoundException("Trainee not found");
+            });
+
+            if (status && !trainee.getUser().getIsActive()){
+                traineeRepository.activateTrainee(trainee.getTraineeId());
+                log.info("Activated Trainee with id: {}", trainee.getTraineeId());
                 return "Activated";
-            } else if (!status && isActive) {
-                traineeRepository.deactivateTrainee(traineeId);
-                log.info("Deactivated Trainee with id: {}", traineeId);
+            } else if (!status && trainee.getUser().getIsActive()) {
+                traineeRepository.deactivateTrainee(trainee.getTraineeId());
+                log.info("Deactivated Trainee with id: {}", trainee.getTraineeId());
                 return "Deactivated";
             } else {
-                log.info("Trainee with id {} is already in the desired state", traineeId);
+                log.info("Trainee with id {} is already in the desired state", trainee.getTraineeId());
                 throw  new IllegalArgumentException("Trainee is already in the desired state");
             }
         }
 
+    @Transactional
     @Override
     public List<TrainersListResponse> updateTraineeTrainersList(String username, List<String> trainersUsernames) {
          Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
@@ -146,12 +128,38 @@ public class TraineeServiceImpl implements TraineeService {
              return new UserNotFoundException("Trainee not found");
          });
          List<Trainer> trainers = traineeRepository.getNotAssignedTrainers(trainee.getUser().getUsername());
-         List<Trainer> addedTrainers= trainerDao.findTrainersByUserUserName(trainersUsernames);
-         trainers.addAll(addedTrainers);
-         trainee.setTrainers(trainers);
+         List<Trainer> addedTrainers= trainerRepository.findTrainersByUserUserName(trainersUsernames);
+
+        boolean isTrainerListValid = addedTrainers.stream()
+                .allMatch(trainer -> trainers.stream()
+                        .anyMatch(existingTrainer -> existingTrainer.getUser().getUsername().equals(trainer.getUser().getUsername())));
+        if(isTrainerListValid){
+            trainee.getTrainers().addAll(addedTrainers);
+        }
+
+        for (Trainer trainer : addedTrainers) {
+            Training newTraining = Training.builder()
+                    .trainee(trainee)
+                    .trainer(trainer)
+                    .trainingType(trainer.getSpecialization())
+                    .trainingName(String.format("Training with %s and %s", trainer.getUser().getUsername(), trainee.getUser().getUsername()))
+                    .trainingDuration(0)
+                    .trainingDate(Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()))
+                    .build();
+            trainingRepository.save(newTraining);
+            trainee.getTrainings().add(newTraining);
+        }
          traineeRepository.save(trainee);
+
          log.info("Updated Trainer list for Trainee with username : {}", username);
-         return traineeMapper.mapTraineesTrainersToDto(trainers);
+
+         return addedTrainers.stream()
+                 .map(trainer -> new TrainersListResponse(
+                         trainer.getUser().getUsername(),
+                         trainer.getUser().getFirstName(),
+                         trainer.getUser().getLastName(),
+                         trainer.getSpecialization().getTrainingType().name()
+                 )).distinct().collect(Collectors.toList());
         }
 
     @Override
@@ -166,12 +174,14 @@ public class TraineeServiceImpl implements TraineeService {
         }
 
     @Override
-    public List<TrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
+    public List<TraineeTrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
         log.info("Retrieving Trainee Trainings by : Criteria: {}", request);
-         List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeUsername(),
+         List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeName(),
              request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypes.valueOf(request.trainingType()));
             log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}",request, trainings);
-            return trainingMapper.mapTrainingsToDto(trainings);
+            return trainingMapper.mapTraineeTrainingsToDto(trainings);
         }
+
+
     }
 

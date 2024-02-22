@@ -16,5 +16,5 @@ public class TrainerInfoResponse {
     private String lastName;
     private String trainingTypes;
     private boolean isActive;
-    private List<TraineeModel> trainees;
+    private List<TraineesListResponse> trainees;
 }

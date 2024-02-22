@@ -19,7 +19,6 @@ public class ProfileServiceImpl implements ProfileService {
         String baseUsername = firstName + "." + lastName;
         String username = baseUsername;
 
-        // Check if the username already exists
         int serialNumber = 1;
         while (userRepository.existsByUsername(username)) {
             username = baseUsername + serialNumber;

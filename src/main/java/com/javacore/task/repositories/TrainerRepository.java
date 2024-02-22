@@ -16,14 +16,12 @@ public interface TrainerRepository extends JpaRepository<Trainer,Long> {
     @Query("select t from Trainer t where t.user.username = ?1")
     Optional<Trainer> findByUserUsername(String username);
     @Modifying
-    @Query("update User u set u.password = :newPassword where u.userId in (select t.user.userId from Trainer t where t.id = :id)")
-    void changeTrainerPassword(@Param("id") long id, @Param("newPassword") String newPassword);
-    @Modifying
-    @Query("update Trainer t set t.user.isActive = true where t.id = ?1")
+    @Query(nativeQuery = true, value = "UPDATE users SET is_active = true WHERE users.user_id IN (SELECT t.user_id FROM trainer t WHERE t.id = ?1)")
     void activateTrainer(long id);
     @Modifying
-    @Query("update Trainer t set t.user.isActive = false where t.id = ?1")
+    @Query(nativeQuery = true, value = "UPDATE users SET is_active = false WHERE users.user_id IN (SELECT t.user_id FROM trainer t WHERE t.id = ?1)")
     void deactivateTrainer(long id);
+
     @Query("SELECT t FROM Training t " +
             "WHERE t.trainer.user.username = :trainerUsername " +
             "AND t.trainingDate BETWEEN :periodFrom AND :periodTo " +

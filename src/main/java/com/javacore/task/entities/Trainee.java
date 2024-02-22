@@ -1,10 +1,7 @@
 package com.javacore.task.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.Date;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.List;
 @Entity
 @Table
 @Data
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,10 +26,13 @@ public class Trainee {
     @Column(name = "ADDRESS")
     private String address;
 
-    @OneToOne
+    @OneToOne(cascade =CascadeType.ALL)
     @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
     private User user;
 
     @ManyToMany(cascade = CascadeType.REMOVE,fetch = FetchType.EAGER)
     private List<Trainer> trainers;
+
+    @OneToMany(mappedBy = "trainee", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST}, fetch = FetchType.EAGER)
+    private List<Training> trainings;
 }

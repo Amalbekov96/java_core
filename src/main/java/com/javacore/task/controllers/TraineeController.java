@@ -1,10 +1,12 @@
 package com.javacore.task.controllers;
 
 import com.javacore.task.models.TraineeModel;
+import com.javacore.task.models.request.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
+import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
-import com.javacore.task.models.response.TrainingInfoResponse;
+import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.services.TraineeService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +28,7 @@ public class TraineeController {
     private final TraineeService traineeService;
 
     @GetMapping("/{traineeId}")
+    @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeModel> getTraineeById(@PathVariable Long traineeId) {
         log.info("Endpoint called: GET /trainees/{}", traineeId);
         TraineeModel traineeModel = traineeService.getTraineeById(traineeId);
@@ -33,39 +36,25 @@ public class TraineeController {
         return ResponseEntity.ok(traineeModel);
     }
 
-    @PostMapping
-    @PreAuthorize("permitAll()")
-    public ResponseEntity<TraineeModel> createTrainee(@RequestBody TraineeModel traineeModel) {
-        log.info("Endpoint called: POST /trainees, Request: {}", traineeModel);
-        TraineeModel createdTrainee = traineeService.createTrainee(traineeModel);
-        log.info("Response: {}", createdTrainee);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTrainee);
-    }
-
-    @PutMapping("/{traineeId}")
-    public ResponseEntity<TraineeModel> updateTrainee(@PathVariable Long traineeId, @RequestBody TraineeModel traineeModel) {
-        log.info("Endpoint called: PUT /trainees/{}", traineeId);
-        TraineeModel updatedTrainee = traineeService.updateTrainee(traineeId, traineeModel);
+    @PutMapping
+    @PreAuthorize("hasAuthority('TRAINEE')")
+    public ResponseEntity<TraineeProfileUpdateResponse> updateTrainee(@Valid @RequestBody TraineeUpdateRequest request) {
+        log.info("Endpoint called: PUT /trainees Request: {}", request);
+        TraineeProfileUpdateResponse updatedTrainee = traineeService.updateTrainee(request);
         log.info("Response: {}", updatedTrainee);
         return ResponseEntity.ok(updatedTrainee);
     }
 
-    @PostMapping("/{traineeId}")
-    @PreAuthorize("hasAuthority('TRAINEE')")
-    public ResponseEntity<String> updateLogin(@PathVariable long traineeId, @RequestParam("password") String password, @RequestParam("newPassword") String newPassword) {
-        log.info("Endpoint called: POST /trainees/{}", traineeId);
-        traineeService.changeTraineePassword(traineeId, password, newPassword);
-        return new ResponseEntity<>("password successfully updated!", HttpStatus.OK);
-    }
-    @DeleteMapping("/{traineeId}")
-    public ResponseEntity<String> deleteTrainee(@PathVariable("traineeId") long traineeId) {
-        log.info("Endpoint called: DELETE /trainees/{}", traineeId);
-        traineeService.deleteTrainee(traineeId);
+    @DeleteMapping
+    public ResponseEntity<String> deleteTrainee(@RequestParam String username) {
+        log.info("Endpoint called: DELETE /trainees?{}", username );
+        traineeService.deleteTrainee(username);
         log.info("Response: deleted successfully");
         return new ResponseEntity<>("deleted successfully", HttpStatus.OK);
     }
 
     @GetMapping
+    @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeInfoResponse> getTraineeProfile(@RequestParam("q") String username) {
         log.info("Endpoint called: GET /trainees, Request: q={}", username);
         TraineeInfoResponse traineeGetByNameResponse = traineeService.findTraineeProfileByUsername(username);
@@ -73,10 +62,10 @@ public class TraineeController {
         return new ResponseEntity<>(traineeGetByNameResponse, HttpStatus.OK);
     }
 
-    @PatchMapping("/{traineeId}")
-    public ResponseEntity<String> updateTraineeStatus(@PathVariable("traineeId") long traineeId, @RequestParam("status") boolean status) {
-        log.info("Endpoint called: PATCH /trainees/{}, Request: choice={}", traineeId, status);
-        String result = traineeService.updateTraineeStatus(status, traineeId);
+    @PatchMapping
+    public ResponseEntity<String> updateTraineeStatus(@RequestParam String username, @RequestParam("status") boolean status) {
+        log.info("Endpoint called: PATCH /trainees?{}, Request: choice={}", username, status);
+        String result = traineeService.updateTraineeStatus(status, username);
         log.info("Response: {}", result);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
@@ -90,7 +79,7 @@ public class TraineeController {
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
-    @PostMapping("/update-trainers")
+    @PutMapping("/update-trainers")
     public ResponseEntity<List<TrainersListResponse>> updateTraineeTrainersList(@RequestParam("username") String username, @RequestBody List<String> trainersUsernames) {
         log.info("Endpoint called: POST /trainees/updateList, Request: username={}, trainersUsernames={}", username, trainersUsernames);
         List<TrainersListResponse> responses = traineeService.updateTraineeTrainersList(username, trainersUsernames);
@@ -99,10 +88,10 @@ public class TraineeController {
     }
 
     @GetMapping("/trainee-trainings")
-    @PreAuthorize("hasAuthority('TRAINEE')")
-    public ResponseEntity<List<TrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
+    @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
+    public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
         log.info("Endpoint called: POST /training/traineeTrainings, Request: {}", request);
-        List<TrainingInfoResponse> responses = traineeService.getTraineeTrainingsByCriteria(request);
+        List<TraineeTrainingInfoResponse> responses = traineeService.getTraineeTrainingsByCriteria(request);
         log.info("Response: {}", responses);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }

@@ -10,4 +10,5 @@ public interface AuthenticationService {
     SignUpResponse traineeSignUp(TraineeRequest request);
     SignUpResponse trainerSignUp(TrainerRequest request);
     SignInResponse signIn(SignInRequest request);
+    void changePassword(String username, String password, String newPassword);
 }

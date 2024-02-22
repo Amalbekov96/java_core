@@ -3,10 +3,13 @@ package com.javacore.task.mappers;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.User;
-import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.TraineeModel;
-import com.javacore.task.models.response.TrainersListResponse;
 import com.javacore.task.models.UserModel;
+import com.javacore.task.models.request.TraineeProfileUpdateResponse;
+import com.javacore.task.models.request.TraineeUpdateRequest;
+import com.javacore.task.models.response.TraineeInfoResponse;
+import com.javacore.task.models.response.TrainersListResponse;
+import com.javacore.task.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +21,7 @@ import java.util.stream.Collectors;
 public class TraineeMapper {
 
     private final UserMapper userMapper;
+    private final UserRepository userRepository;
 
     public TraineeModel traineeToTraineeModel(Trainee trainee) {
         TraineeModel traineeModel = new TraineeModel();
@@ -25,7 +29,6 @@ public class TraineeMapper {
         traineeModel.setDateOfBirth(trainee.getDateOfBirth());
         traineeModel.setAddress(trainee.getAddress());
 
-        // Map User details using UserMapper
         if (trainee.getUser() != null) {
             User user = trainee.getUser();
             UserModel userModel = userMapper.userToUserModel(user);
@@ -41,7 +44,6 @@ public class TraineeMapper {
         trainee.setDateOfBirth(traineeModel.getDateOfBirth());
         trainee.setAddress(traineeModel.getAddress());
 
-        // Map User details using UserMapper
         if (traineeModel.getUser() != null) {
             UserModel userModel = traineeModel.getUser();
             User user = userMapper.userModelToUser(userModel);
@@ -51,13 +53,15 @@ public class TraineeMapper {
         return trainee;
     }
 
-    public void update(TraineeModel traineeModel, Trainee trainee) {
-        if (traineeModel != null && trainee != null) {
-            trainee.setAddress(traineeModel.getAddress());
-            trainee.setDateOfBirth(traineeModel.getDateOfBirth());
-            trainee.setTraineeId(traineeModel.getTraineeId());
-            trainee.setUser(userMapper.userModelToUser(traineeModel.getUser()));
+    public Trainee update(TraineeUpdateRequest request, Trainee trainee) {
+        if (request != null && trainee != null) {
+            trainee.setAddress(request.address());
+            trainee.setDateOfBirth(request.dateOfBirth());
+            trainee.getUser().setFirstName(request.firstName());
+            trainee.getUser().setLastName(request.lastName());
+            trainee.getUser().setIsActive(request.isActive());
         }
+        return trainee;
     }
 
     public List<TrainersListResponse> mapTraineesTrainersToDto(List<Trainer> trainers) {
@@ -89,5 +93,24 @@ public class TraineeMapper {
                                 trainer.getSpecialization().getTrainingType().name()
                         ))
                         .collect(Collectors.toList()));
+    }
+
+    public TraineeProfileUpdateResponse traineeToTraineeResponse(Trainee existingTrainee) {
+        return new TraineeProfileUpdateResponse(
+                existingTrainee.getUser().getUsername(),
+                existingTrainee.getUser().getFirstName(),
+                existingTrainee.getUser().getLastName(),
+                existingTrainee.getDateOfBirth(),
+                existingTrainee.getAddress(),
+                existingTrainee.getUser().getIsActive(),
+                existingTrainee.getTrainers().stream()
+                        .map(trainer -> new TrainersListResponse(
+                                trainer.getUser().getUsername(),
+                                trainer.getUser().getFirstName(),
+                                trainer.getUser().getLastName(),
+                                trainer.getSpecialization().getTrainingType().name()
+                        ))
+                        .collect(Collectors.toList())
+        );
     }
 }
