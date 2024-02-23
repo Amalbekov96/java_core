@@ -10,7 +10,7 @@ import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.*;
-import com.javacore.task.models.request.TraineeProfileUpdateResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
@@ -58,21 +58,15 @@ public class TraineeServiceImpl implements TraineeService {
     @Transactional
     @Override
     public TraineeProfileUpdateResponse updateTrainee(TraineeUpdateRequest request) {
-        try {
+
             Trainee existingTrainee = traineeRepository.findTraineeByUserUsername(request.userName()).orElseThrow(
                     () -> new UserNotFoundException(String.format("Trainee with username: %s not found", request.userName())));
-            if(existingTrainee == null) {
-                throw new ApiException("Trainee with username " + request.userName() + " not found", ErrorCode.TRAINER_NOT_FOUND);
-            }
 
             Trainee trainee = traineeMapper.update(request, existingTrainee);
             traineeRepository.save(trainee);
 
             return traineeMapper.traineeToTraineeResponse(existingTrainee);
-        } catch (Exception e) {
-            log.error("Error updating Trainee", e);
-            throw new ApiException("Error updating Trainee", ErrorCode.TRAINER_NOT_FOUND);
-        }
+
     }
 
     @Transactional
@@ -90,7 +84,7 @@ public class TraineeServiceImpl implements TraineeService {
         public TraineeInfoResponse findTraineeProfileByUsername(String username) {
             Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
                 log.warn("Response: Trainee not found");
-                return new UserNotFoundException("Trainee not found");
+                throw  new UserNotFoundException("Trainee not found");
             });
             log.info("Retrieved Trainee profile by username: {}, Trainee: {}", username, trainee);
             return traineeMapper.traineeInfoResponse(trainee);
@@ -103,7 +97,7 @@ public class TraineeServiceImpl implements TraineeService {
 
            Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
                 log.warn("Response: Trainee not found");
-                return new UserNotFoundException("Trainee not found");
+                throw  new UserNotFoundException("Trainee not found");
             });
 
             if (status && !trainee.getUser().getIsActive()){
@@ -125,7 +119,7 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TrainersListResponse> updateTraineeTrainersList(String username, List<String> trainersUsernames) {
          Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
              log.warn("Response: Trainee not found");
-             return new UserNotFoundException("Trainee not found");
+             throw  new UserNotFoundException("Trainee not found");
          });
          List<Trainer> trainers = traineeRepository.getNotAssignedTrainers(trainee.getUser().getUsername());
          List<Trainer> addedTrainers= trainerRepository.findTrainersByUserUserName(trainersUsernames);
@@ -166,7 +160,7 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TrainersListResponse> getNotAssignedActiveTrainersListForTrainee(String username) {
          Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
              log.warn("Response: Trainee not found");
-             return new UserNotFoundException("Trainee not found");
+            throw new UserNotFoundException("Trainee not found");
          });
          List<Trainer> trainers = traineeRepository.getNotAssignedTrainers(trainee.getUser().getUsername());
          log.info("Retrieved not assigned active trainers list for Trainee with username {}: {}", username, trainers);
@@ -176,12 +170,16 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public List<TraineeTrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
         log.info("Retrieving Trainee Trainings by : Criteria: {}", request);
-         List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeName(),
-             request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypes.valueOf(request.trainingType()));
-            log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}",request, trainings);
+        if (traineeRepository.existsByUserUsername(request.traineeName())) {
+            List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeName(),
+                    request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypes.valueOf(request.trainingType())).orElseThrow(
+                    () -> new UserNotFoundException("Data not found"));
+
+            log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}", request, trainings);
             return trainingMapper.mapTraineeTrainingsToDto(trainings);
+        } else {
+            throw new UserNotFoundException("Trainee not found");
         }
-
-
+    }
     }
 

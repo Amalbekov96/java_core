@@ -1,41 +1,37 @@
 package com.javacore.task.controllers;
 
-import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.models.request.TrainingRequest;
-import com.javacore.task.models.response.SignInResponse;
-import io.restassured.http.ContentType;
+import com.javacore.task.services.TrainingService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
+import java.io.IOException;
 import java.util.Date;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doNothing;
+
 @Transactional
 class TrainingControllerTest {
-    private static final String BASE_URL = "http://localhost:8080";
-    private SignInResponse signInResponse;
+    @Mock
+    private TrainingService trainingService;
+
+    @InjectMocks
+    private TrainingController trainingController;
 
     @BeforeEach
     void setUp() {
-        io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
-
-        signInResponse = given()
-                .contentType(ContentType.JSON)
-                .body(signInRequest)
-                .when()
-                .post(BASE_URL+"/api/v1/auth/sign-in")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(SignInResponse.class);
-
+        MockitoAnnotations.initMocks(this);
     }
+
     @Test
-    void testCreateTraining() {
+    void testCreateTraining() throws IOException {
         TrainingRequest requestBody = new TrainingRequest(
                 "Kanysh.Abdyrakmanova",
                 "Kushtar.Amalbekov",
@@ -43,16 +39,10 @@ class TrainingControllerTest {
                 new Date(),
                 2
         );
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .post(BASE_URL + "/trainings")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .body(equalTo("saved successfully"))
-                .extract().asString();
+        doNothing().when(trainingService).saveTraining(requestBody);
+        ResponseEntity<String> responseEntity = trainingController.saveTraining(requestBody);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals("saved successfully", responseEntity.getBody());
     }
+
 }

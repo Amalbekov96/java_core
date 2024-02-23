@@ -1,8 +1,9 @@
 package com.javacore.task.controllers;
 
-import com.javacore.task.models.TrainingModel;
 import com.javacore.task.models.request.TrainingRequest;
 import com.javacore.task.services.TrainingService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +19,12 @@ import java.io.IOException;
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainings")
 @RequiredArgsConstructor
+@Tag(name = "Training API", description = "API for training operations")
 public class TrainingController {
 
     private final TrainingService trainingService;
 
+    @Operation(summary = "Save training")
     @PostMapping
     public ResponseEntity<String> saveTraining(@Valid @RequestBody TrainingRequest training) throws IOException {
         log.info("Endpoint called: POST /training, Request: {}", training);

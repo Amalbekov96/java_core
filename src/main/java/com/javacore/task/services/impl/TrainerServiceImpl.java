@@ -90,8 +90,14 @@ public class TrainerServiceImpl implements TrainerService {
     }
     @Override
     public List<TrainerTrainingInfoResponse> getTrainerTrainingsByCriteria(TrainerTrainingsRequest request) {
-        List<Training> trainings = trainerRepository.getTrainerTrainingsByCriteria(request.username(),request.periodFrom(),request.periodTo(),request.traineeName());
+        if (trainerRepository.existsByUserUsername(request.username())) {
+        List<Training> trainings = trainerRepository.getTrainerTrainingsByCriteria(request.username(),request.periodFrom(),request.periodTo(),request.traineeName()).orElseThrow(
+                () -> new UserNotFoundException("Trainings not found")
+        );
         log.info("Retrieved Trainer Trainings by Criteria: {}, Trainings: {}",request, trainings);
         return trainingDTOMapper.mapTrainerTrainingsToDto(trainings);
+    }else {
+            throw new UserNotFoundException("Trainer not found");
+        }
     }
 }

@@ -8,94 +8,88 @@ import com.javacore.task.models.request.TraineeRequest;
 import com.javacore.task.models.request.TrainerRequest;
 import com.javacore.task.models.response.SignInResponse;
 import com.javacore.task.models.response.SignUpResponse;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
+import com.javacore.task.services.AuthenticationService;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 import java.util.Date;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.notNullValue;
-
 @Transactional
 class AuthControllerTest {
+    @Mock
+    private AuthenticationService authenticationService;
 
-    private static final String BASE_URL = "http://localhost:8080";
+    @InjectMocks
+    private AuthenticationController authController;
+
     @BeforeEach
     void setUp() {
-        RestAssured.port = 8080;
+        MockitoAnnotations.initMocks(this);
     }
 
     @Test
     void testTraineeSignUp() {
-        TraineeRequest traineeRequest = new TraineeRequest("John",
-                "Doe",new Date(), "123 Main St");
 
-        SignUpResponse sign = given()
-                .contentType(ContentType.JSON)
-                .body(traineeRequest)
-                .when()
-                .post(BASE_URL+"/api/v1/auth/trainee/sign-up")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(SignUpResponse.class);
+        TraineeRequest traineeRequest = new TraineeRequest("John", "Doe", new Date(), "123 Main St");
+        SignUpResponse expectedResponse = new SignUpResponse(
+                "token",
+                "John.Doe",
+                "rfgtyuiop",
+                UserRole.TRAINEE
+        );
+        when(authenticationService.traineeSignUp(any(TraineeRequest.class))).thenReturn(expectedResponse);
 
-        assertThat(sign.generatedPassword(), notNullValue());
-        assertThat(sign.token(), notNullValue());
-        assertThat(sign.username(), notNullValue());
-        Assertions.assertEquals(sign.role(), UserRole.TRAINEE);
+        SignUpResponse responseEntity = authController.traineeSignUp(traineeRequest);
+
+        assertEquals(expectedResponse, responseEntity);
+        verify(authenticationService, times(1)).traineeSignUp(traineeRequest);
+
     }
+
+
 
 
     @Test
     void testTrainerSignUp() {
-        TrainingType trainingType = TrainingType.builder()
-                .id(2L)
-                .trainingType(TrainingTypes.FITNESS)
-                .build();
-        TrainerRequest trainerRequest = new TrainerRequest("John",
-                "Doe", trainingType);
 
-        SignUpResponse sign = given()
-                .contentType(ContentType.JSON)
-                .body(trainerRequest)
-                .when()
-                .post(BASE_URL+"/api/v1/auth/trainer/sign-up")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(SignUpResponse.class);
+        TrainerRequest trainerRequest = new TrainerRequest("John", "Doe", new TrainingType(3L,TrainingTypes.WEIGHT_LIFTING));
+        SignUpResponse expectedResponse = new SignUpResponse(
+                "token",
+                "John.Doe",
+                "rfgtyuiop",
+                UserRole.TRAINER
+        );
+        when(authenticationService.trainerSignUp(any(TrainerRequest.class))).thenReturn(expectedResponse);
 
-        assertThat(sign.generatedPassword(), notNullValue());
-        assertThat(sign.token(), notNullValue());
-        assertThat(sign.role(), notNullValue());
-        assertThat(sign.username(), notNullValue());
+        SignUpResponse responseEntity = authController.trainerSignUp(trainerRequest);
+
+        assertEquals(expectedResponse, responseEntity);
+        verify(authenticationService, times(1)).trainerSignUp(trainerRequest);
+
     }
 
     @Test
     void testSignIn() {
+
         SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
+        SignInResponse expectedResponse = new SignInResponse(
+                "token",
+                "Kushtar.Amalbekov",
+                UserRole.TRAINER
+        );
+        when(authenticationService.signIn(any(SignInRequest.class))).thenReturn(expectedResponse);
 
-        SignInResponse signInResponse = given()
-                .contentType(ContentType.JSON)
-                .body(signInRequest)
-                .when()
-                .post(BASE_URL+"/api/v1/auth/sign-in")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(SignInResponse.class);
+        SignInResponse responseEntity = authController.signIn(signInRequest);
 
-        assertThat(signInResponse.token(), notNullValue());
-        assertThat(signInResponse.role(), notNullValue());
-        assertThat(signInResponse.username(), notNullValue());
+        assertEquals(expectedResponse, responseEntity);
+        verify(authenticationService, times(1)).signIn(signInRequest);
+
+
     }
 }

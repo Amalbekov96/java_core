@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface TraineeRepository extends JpaRepository<Trainee,Long>  {
+    boolean existsByUserUsername(String username);
     @Query("select t from Trainee t where t.user.username = ?1")
     Optional<Trainee> findTraineeByUserUsername(String username);
     @Modifying
@@ -58,7 +59,7 @@ public interface TraineeRepository extends JpaRepository<Trainee,Long>  {
             "AND t.trainer.user.username = :trainerName " +
 
             "ORDER BY t.trainingDate ASC")
-    List<Training> getTraineeTrainingsByCriteria(
+    Optional<List<Training>> getTraineeTrainingsByCriteria(
 
             @Param("traineeUsername") String traineeUsername,
 

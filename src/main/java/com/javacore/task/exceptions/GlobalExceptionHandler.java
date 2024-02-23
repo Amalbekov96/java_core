@@ -48,7 +48,8 @@ public class GlobalExceptionHandler {
         Map<String,String> errors = new HashMap<>();
         errors.put(MESSAGE_KEY,exception.getMessage());
         return errors;
-    }@ExceptionHandler(IllegalArgumentException.class)
+    }
+    @ExceptionHandler(IllegalArgumentException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String,String> illegalException(@jakarta.validation.constraints.NotNull IllegalArgumentException exception){
         Map<String,String> errors = new HashMap<>();
@@ -67,12 +68,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred");
     }
     @ExceptionHandler(UserNotFoundException.class)
-    public ResponseEntity<String> handleException(UserNotFoundException e) {
-        log.error("USER not found: {}", e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("user with such name not found");
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String,String> handleNotFoundException(@jakarta.validation.constraints.NotNull UserNotFoundException exception){
+        Map<String,String> errors = new HashMap<>();
+        errors.put(MESSAGE_KEY,exception.getMessage());
+        return errors;
     }
-
-
-
-
+    @ExceptionHandler(InactiveUserException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleInactiveUserException(InactiveUserException exception) {
+        Map<String, String> errors = new HashMap<>();
+        errors.put("error", exception.getMessage());
+        return errors;
+    }
 }
