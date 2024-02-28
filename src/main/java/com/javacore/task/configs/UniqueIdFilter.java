@@ -49,6 +49,7 @@ public class UniqueIdFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
         try {
+
             final String token = extractToken(request);
             MDC.put(mdcKey, token);
             if (StringUtils.hasText(responseHeader)) {

@@ -134,10 +134,10 @@ public class TraineeController {
             @ApiResponse(responseCode = "200", description= "Successfully retrieved trainee trainings list"),
             @ApiResponse(responseCode = "404", description = "Trainings not found")
     })
-    @GetMapping("/trainee-trainings")
+    @PostMapping("/trainee-trainings")
     @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
     public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
-        log.info("Endpoint called: GET trainee-trainings, Request: {}", request);
+        log.info("Endpoint called: POST trainee-trainings, Request: {}", request);
         List<TraineeTrainingInfoResponse> responses = traineeService.getTraineeTrainingsByCriteria(request);
         log.info("Response: {}", responses);
         return new ResponseEntity<>(responses, HttpStatus.OK);
