@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 @Repository
 public interface TrainerRepository extends JpaRepository<Trainer,Long> {
+    boolean existsByUserUsername(String username);
     @Query("select t from Trainer t where t.user.username = ?1")
     Optional<Trainer> findByUserUsername(String username);
     @Modifying
@@ -27,7 +28,7 @@ public interface TrainerRepository extends JpaRepository<Trainer,Long> {
             "AND t.trainingDate BETWEEN :periodFrom AND :periodTo " +
             "AND t.trainee.user.username = :traineeName " +
             "ORDER BY t.trainingDate ASC")
-    List<Training> getTrainerTrainingsByCriteria(
+    Optional<List<Training>> getTrainerTrainingsByCriteria(
             @Param("trainerUsername") String trainerUsername,
             @Param("periodFrom") Date periodFrom,
             @Param("periodTo")  Date periodTo,

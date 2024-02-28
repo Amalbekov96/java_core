@@ -2,6 +2,7 @@ package com.javacore.task.controllers;
 
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.services.TrainingTypeService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,21 +19,17 @@ import java.util.List;
 @Slf4j
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequiredArgsConstructor
+@Tag(name = "Training Types Controller", description = "Endpoints for Training Types operations")
 public class TrainingTypesRestController {
 
     private final TrainingTypeService trainingTypeService;
 
     @GetMapping
     public ResponseEntity<List<TrainingType>> getTrainingTypes() {
-        try {
             log.info("Endpoint called: GET /training-type");
             List<TrainingType> trainingTypeList = trainingTypeService.getAllTrainingTypes();
             log.info("Response: Retrieved {} training types", trainingTypeList.size());
             return new ResponseEntity<>(trainingTypeList, HttpStatus.OK);
-        } catch (Exception e) {
-            log.error("Error occurred while fetching training types", e);
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
     }
 
 }

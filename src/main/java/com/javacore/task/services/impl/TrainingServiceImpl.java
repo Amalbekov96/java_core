@@ -32,13 +32,13 @@ public class TrainingServiceImpl implements TrainingService {
         Trainee trainee = traineeRepository.findTraineeByUserUsername(training.traineeUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: Trainee not found");
-                    return new UserNotFoundException("Trainee not found");
+                    throw new UserNotFoundException("Trainee not found");
                 }
         );
         Trainer trainer = trainerRepository.findByUserUsername(training.trainerUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: Trainer not found");
-                    return new UserNotFoundException("Trainer not found");
+                    throw new UserNotFoundException("Trainer not found");
                 });
         if (trainee.getTrainers()==null){
             trainee.setTrainers(new ArrayList<>());

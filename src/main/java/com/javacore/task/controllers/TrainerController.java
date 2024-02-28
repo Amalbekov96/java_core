@@ -7,6 +7,10 @@ import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
 import com.javacore.task.services.TrainerService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,10 +26,16 @@ import java.util.List;
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainers")
 @RequiredArgsConstructor
+@Tag(name = "Trainer API", description = "Endpoints for trainer operations")
 public class TrainerController {
 
     private final TrainerService trainerService;
 
+    @Operation(summary = "Get Trainer by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Trainer by ID"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
+    })
     @GetMapping("/{trainerId}")
     public ResponseEntity<TrainerModel> getTrainerById(@PathVariable Long trainerId) {
         log.info("Endpoint called: GET /trainers/{}", trainerId);
@@ -34,6 +44,11 @@ public class TrainerController {
         return ResponseEntity.ok(trainerModel);
     }
 
+    @Operation(summary = "Update Trainer Profile")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Trainer profile"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
+    })
     @PutMapping
     public ResponseEntity<TrainerUpdateResponse> updateTrainer(@Valid @RequestBody TrainerUpdateRequest request) {
         log.info("Endpoint called: PUT /trainers Request: {}", request);
@@ -42,25 +57,41 @@ public class TrainerController {
         return ResponseEntity.ok(updatedTrainer);
     }
 
+    @Operation(summary = "Get Trainer Profile by Username")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Trainer profile by username"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
+    })
     @GetMapping
     public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("q") String username) {
-        log.info("Endpoint called: GET /trainer, Request: q={}", username);
+        log.info("Endpoint called: GET /trainer?q={}", username);
         TrainerInfoResponse response = trainerService.findTrainerProfileByUsername(username);
         log.info("Response: {}", response);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
+    @Operation(summary = "Update Trainer Status")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully updated Trainer status"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found"),
+            @ApiResponse(responseCode = "409", description = "Trainer is already in desired state")
+    })
     @PatchMapping
     public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") boolean status) {
-        log.info("Endpoint called: PATCH /trainer?{}, Request: choice={}", username, status);
+        log.info("Endpoint called: PATCH /trainer?{}&choice={}", username, status);
         String result = trainerService.updateTrainerStatus(status, username);
         log.info("Response: {}", result);
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
+    @Operation(summary = "Get Trainer Trainings")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Successfully retrieved Trainer trainings"),
+            @ApiResponse(responseCode = "404", description = "Trainer not found")
+    })
     @GetMapping("/trainer-trainings")
     public ResponseEntity<List<TrainerTrainingInfoResponse>> getTrainerTrainingsList(@Valid @RequestBody TrainerTrainingsRequest request) {
-        log.info("Endpoint called: POST /training/trainerTrainings, Request: {}", request);
+        log.info("Endpoint called: GET /trainer-trainings, Request: {}", request);
         List<TrainerTrainingInfoResponse> responses = trainerService.getTrainerTrainingsByCriteria(request);
         log.info("Response: {}", responses);
         return new ResponseEntity<>(responses, HttpStatus.OK);

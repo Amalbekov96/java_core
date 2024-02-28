@@ -1,7 +1,7 @@
 package com.javacore.task.services;
 
 import com.javacore.task.models.*;
-import com.javacore.task.models.request.TraineeProfileUpdateResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;

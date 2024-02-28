@@ -1,55 +1,48 @@
 package com.javacore.task.controllers;
 
 import com.javacore.task.models.request.*;
-import com.javacore.task.models.response.SignInResponse;
-import io.restassured.http.ContentType;
+import com.javacore.task.models.response.*;
+import com.javacore.task.services.TraineeService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+
 @Transactional
 class TraineeControllerTest {
-    private static final String BASE_URL = "http://localhost:8080";
-    private SignInResponse signInResponse;
+    @Mock
+    private TraineeService traineeService;
+
+    @InjectMocks
+    private TraineeController traineeController;
 
     @BeforeEach
-    void setUp() {
-        io.restassured.RestAssured.port = 8080;
-        SignInRequest signInRequest = new SignInRequest("Kushtar.Amalbekov", "ziJ4jlTA22");
-
-        signInResponse = given()
-                .contentType(ContentType.JSON)
-                .body(signInRequest)
-                .when()
-                .post("/api/v1/auth/sign-in")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(SignInResponse.class);
-
+    public void setup() {
+        MockitoAnnotations.initMocks(this);
     }
+
     @Test
     void testDeleteTrainee() {
-
         String username = "Kairat.Uzenov";
+        doNothing().when(traineeService).deleteTrainee(username);
 
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .when()
-                .delete(BASE_URL + "/trainees?username=" + username)
-                .then()
-                .statusCode(200)
-                .body(equalTo("deleted successfully"));
+        ResponseEntity<String> response = traineeController.deleteTrainee(username);
+
+        verify(traineeService).deleteTrainee(username);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("deleted successfully", response.getBody());
     }
 
 
@@ -61,58 +54,44 @@ class TraineeControllerTest {
                         "Alanushka", "Mamanovichov",
                         new Date(),
                         "123 Main St",true);
+        TraineeProfileUpdateResponse expectedResponse = new TraineeProfileUpdateResponse(/* Populate with expected response */);
+        when(traineeService.updateTrainee(any(TraineeUpdateRequest.class))).thenReturn(expectedResponse);
 
-       TraineeProfileUpdateResponse traineeProfileUpdateResponse =  given()
-               .header("Authorization", "Bearer " + signInResponse.token())
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .put(BASE_URL + "/trainees" )
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(TraineeProfileUpdateResponse.class);
+        ResponseEntity<TraineeProfileUpdateResponse> response = traineeController.updateTrainee(requestBody);
 
-        assertThat(traineeProfileUpdateResponse.getFirstName(), equalTo(requestBody.firstName()));
-        assertThat(traineeProfileUpdateResponse.getLastName(), equalTo(requestBody.lastName()));
-        assertThat(traineeProfileUpdateResponse.getAddress(), equalTo(requestBody.address()));
-
-
+        verify(traineeService).updateTrainee(requestBody);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(expectedResponse, response.getBody());
     }
+
 
     @Test
     void testGetTraineeProfile() {
 
         String username = "Kanysh.Abdyrakmanova";
+        TraineeInfoResponse expectedResponse = new TraineeInfoResponse();
+        when(traineeService.findTraineeProfileByUsername(username)).thenReturn(expectedResponse);
 
-        TraineeInfoResponse response = given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .when()
-                .get(BASE_URL + "/trainees?q=" + username)
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract()
-                .as(TraineeInfoResponse.class);
+        TraineeInfoResponse response = traineeController.getTraineeProfile(username).getBody();
 
-        assertThat(response.getFirstName(), notNullValue());
-        assertThat(response.getLastName(), notNullValue());
-        assertThat(response.getAddress(), notNullValue());
+        verify(traineeService).findTraineeProfileByUsername(username);
+        assert response != null;
+        assertEquals(expectedResponse.getFirstName(), response.getFirstName());
+        assertEquals(expectedResponse.getLastName(), response.getLastName());
+        assertEquals(expectedResponse.getAddress(), response.getAddress());
     }
     @Test
     void testUpdateTraineeStatus() {
-        boolean choice = false;
-       String username = "Kanysh.Abdyrakmanova";
 
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .when()
-                .patch(BASE_URL + "/trainees?username=" + username + "&status=" + choice)
-                .then()
-                .log().all()
-                .statusCode(200)
-                .body(equalTo("Deactivated"));
+        String username = "Kanysh.Abdyrakmanova";
+        boolean choice = false;
+        when(traineeService.updateTraineeStatus(choice, username)).thenReturn("Deactivated");
+
+        ResponseEntity<String> response = traineeController.updateTraineeStatus(username, choice);
+
+        verify(traineeService).updateTraineeStatus(choice, username);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("Deactivated", response.getBody());
     }
 
 
@@ -120,37 +99,42 @@ class TraineeControllerTest {
     void testGetNotAssignedTrainersForTrainee() {
 
         String username = "Kanysh.Abdyrakmanova";
+        List<TrainersListResponse> expectedResponse = Arrays.asList(
+                new TrainersListResponse("Kushtar.Amalbekov", "Kushtar", "Amalbekov", "FITNESS"),
+                new TrainersListResponse("Aiperi.Adylova", "Aiperi", "Adylova", "FITNESS")
+        );
+        when(traineeService.getNotAssignedActiveTrainersListForTrainee(username)).thenReturn(expectedResponse);
 
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .when()
-                .get(BASE_URL + "/trainees/not-assigned-trainers?username=" + username)
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract().asString();
+        ResponseEntity<List<TrainersListResponse>> responseEntity = traineeController.getNotAssignedTrainersForTrainee(username);
+
+        verify(traineeService).getNotAssignedActiveTrainersListForTrainee(username);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(expectedResponse, responseEntity.getBody());
     }
 
     @Test
     void testUpdateTraineeTrainersList() {
+
         String username = "Kanysh.Abdyrakmanova";
-        List<String> trainersUsernames = Arrays.asList("Kushtar.Amalbekov","Aiperi.Adylova");
+        List<String> trainersUsernames = Arrays.asList("Kushtar.Amalbekov", "Aiperi.Adylova");
+        List<TrainersListResponse> expectedResponse = Arrays.asList(new TrainersListResponse("Kushtar.Amalbekov", "Kushtar", "Amalbekov", "FITNESS"),
+                new TrainersListResponse("Aiperi.Adylova", "Aiperi", "Adylova", "FITNESS"));
+        ResponseEntity<List<TrainersListResponse>> expectedResponseEntity = ResponseEntity.ok(expectedResponse);
 
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token() )
-                .contentType(ContentType.JSON)
-                .body(trainersUsernames)
-                .when()
-                .put(BASE_URL + "/trainees/update-trainers?username=" + username)
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract().asString();
+        when(traineeService.updateTraineeTrainersList(username, trainersUsernames)).thenReturn(expectedResponse);
 
+        ResponseEntity<List<TrainersListResponse>> responseEntity = traineeController.updateTraineeTrainersList(username, trainersUsernames);
+
+
+        verify(traineeService).updateTraineeTrainersList(username, trainersUsernames);
+        assertEquals(expectedResponseEntity, responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(expectedResponse, responseEntity.getBody());
     }
 
     @Test
     void testGetTraineeTrainingsList() {
+
         String username = "Kanysh.Abdyrakmanova";
         TraineeTrainingsRequest requestBody = new TraineeTrainingsRequest(
                 username,
@@ -159,17 +143,18 @@ class TraineeControllerTest {
                 java.sql.Date.valueOf(LocalDate.of(2021, 10, 11)),
                 java.sql.Date.valueOf(LocalDate.of(2024, 2, 11))
         );
-        given()
-                .header("Authorization", "Bearer " + signInResponse.token())
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .get(BASE_URL + "/trainees/trainee-trainings")
-                .then()
-                .log().all()
-                .statusCode(200)
-                .extract().asString();
+        List<TraineeTrainingInfoResponse> expectedResponse = List.of(new TraineeTrainingInfoResponse());
+        ResponseEntity<List<TraineeTrainingInfoResponse>> expectedResponseEntity = ResponseEntity.ok(expectedResponse);
 
+        when(traineeService.getTraineeTrainingsByCriteria(requestBody)).thenReturn(expectedResponse);
+
+        ResponseEntity<List<TraineeTrainingInfoResponse>> responseEntity = traineeController.getTraineeTrainingsList(requestBody);
+
+
+        verify(traineeService).getTraineeTrainingsByCriteria(requestBody);
+        assertEquals(expectedResponseEntity, responseEntity);
+        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        assertEquals(expectedResponse, responseEntity.getBody());
     }
 
 }

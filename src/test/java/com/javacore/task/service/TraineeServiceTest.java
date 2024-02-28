@@ -8,7 +8,7 @@ import com.javacore.task.enums.TrainingTypes;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.TraineeModel;
-import com.javacore.task.models.request.TraineeProfileUpdateResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
@@ -183,7 +183,7 @@ public class TraineeServiceTest {
         List<Training> trainings = new ArrayList<>();
         when(traineeRepository.getTraineeTrainingsByCriteria(
                 anyString(), any(Date.class), any(Date.class), anyString(), any(TrainingTypes.class)
-        )).thenReturn(trainings);
+        )).thenReturn(Optional.of(trainings));
         TraineeTrainingInfoResponse response = new TraineeTrainingInfoResponse("thirdOne",date,"WEIGHT_LIFTING",8,"Kairat.Uzenov");
         List<TraineeTrainingInfoResponse> expectedResponse = new ArrayList<>();
         expectedResponse.add(response);

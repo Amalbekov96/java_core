@@ -93,7 +93,7 @@ public class TrainerServiceTest {
                 eq(request.periodFrom()),
                 eq(request.periodTo()),
                 eq(request.traineeName())
-        )).thenReturn(trainings);
+        )).thenReturn(Optional.of(trainings));
 
         List<TrainerTrainingInfoResponse> result = trainerService.getTrainerTrainingsByCriteria(request);
 

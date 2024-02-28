@@ -3,9 +3,10 @@ package com.javacore.task.mappers;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.User;
+import com.javacore.task.exceptions.InactiveUserException;
 import com.javacore.task.models.TraineeModel;
 import com.javacore.task.models.UserModel;
-import com.javacore.task.models.request.TraineeProfileUpdateResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
@@ -59,7 +60,12 @@ public class TraineeMapper {
             trainee.setDateOfBirth(request.dateOfBirth());
             trainee.getUser().setFirstName(request.firstName());
             trainee.getUser().setLastName(request.lastName());
-            trainee.getUser().setIsActive(request.isActive());
+            Boolean isActive = request.isActive();
+            if (isActive == null) {
+                throw new InactiveUserException("Active status cannot be null");
+            } else {
+                trainee.getUser().setIsActive(isActive);
+            }
         }
         return trainee;
     }

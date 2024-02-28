@@ -1,6 +1,4 @@
-package com.javacore.task.models.request;
-
-import com.javacore.task.models.response.TrainersListResponse;
+package com.javacore.task.models.response;
 import lombok.*;
 
 import java.util.Date;
