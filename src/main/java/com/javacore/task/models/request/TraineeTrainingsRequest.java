@@ -2,17 +2,26 @@ package com.javacore.task.models.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-public record TraineeTrainingsRequest(
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TraineeTrainingsRequest {
         @NotBlank(message = "User name cannot be null")
-        String traineeName,
-        String trainerName,
-        String trainingType,
+        private String traineeName;
+
+        private String trainerName;
+
+        private String trainingType;
+
         @JsonFormat(pattern = "yyyy-MM-dd")
-        Date periodFrom,
+        private Date periodFrom;
+
         @JsonFormat(pattern = "yyyy-MM-dd")
-        Date periodTo
-) {
+        private Date periodTo;
 }

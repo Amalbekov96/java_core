@@ -56,11 +56,11 @@ public class TraineeMapper {
 
     public Trainee update(TraineeUpdateRequest request, Trainee trainee) {
         if (request != null && trainee != null) {
-            trainee.setAddress(request.address());
-            trainee.setDateOfBirth(request.dateOfBirth());
-            trainee.getUser().setFirstName(request.firstName());
-            trainee.getUser().setLastName(request.lastName());
-            Boolean isActive = request.isActive();
+            trainee.setAddress(request.getAddress());
+            trainee.setDateOfBirth(request.getDateOfBirth());
+            trainee.getUser().setFirstName(request.getFirstName());
+            trainee.getUser().setLastName(request.getLastName());
+            Boolean isActive = request.getIsActive();
             if (isActive == null) {
                 throw new InactiveUserException("Active status cannot be null");
             } else {

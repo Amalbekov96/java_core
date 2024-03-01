@@ -59,8 +59,8 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public TraineeProfileUpdateResponse updateTrainee(TraineeUpdateRequest request) {
 
-            Trainee existingTrainee = traineeRepository.findTraineeByUserUsername(request.userName()).orElseThrow(
-                    () -> new UserNotFoundException(String.format("Trainee with username: %s not found", request.userName())));
+            Trainee existingTrainee = traineeRepository.findTraineeByUserUsername(request.getUserName()).orElseThrow(
+                    () -> new UserNotFoundException(String.format("Trainee with username: %s not found", request.getUserName())));
 
             Trainee trainee = traineeMapper.update(request, existingTrainee);
             traineeRepository.save(trainee);
@@ -170,9 +170,9 @@ public class TraineeServiceImpl implements TraineeService {
     @Override
     public List<TraineeTrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
         log.info("Retrieving Trainee Trainings by : Criteria: {}", request);
-        if (traineeRepository.existsByUserUsername(request.traineeName())) {
-            List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.traineeName(),
-                    request.periodFrom(), request.periodTo(), request.trainerName(), TrainingTypes.valueOf(request.trainingType())).orElseThrow(
+        if (traineeRepository.existsByUserUsername(request.getTraineeName())) {
+            List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.getTraineeName(),
+                    request.getPeriodFrom(), request.getPeriodTo(), request.getTrainerName(), TrainingTypes.valueOf(request.getTrainingType())).orElseThrow(
                     () -> new UserNotFoundException("Data not found"));
 
             log.info("Retrieved Trainee Trainings by : Criteria: {}, Trainings: {}", request, trainings);
