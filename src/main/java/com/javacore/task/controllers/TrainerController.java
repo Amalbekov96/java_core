@@ -63,7 +63,10 @@ public class TrainerController {
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
     @GetMapping
-    public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("q") String username) {
+    public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("trainerUsername") String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Trainer username cannot be null or empty");
+        }
         log.info("Endpoint called: GET /trainer?q={}", username);
         TrainerInfoResponse response = trainerService.findTrainerProfileByUsername(username);
         log.info("Response: {}", response);
@@ -77,7 +80,10 @@ public class TrainerController {
             @ApiResponse(responseCode = "409", description = "Trainer is already in desired state")
     })
     @PatchMapping
-    public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") boolean status) {
+    public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") Boolean status) {
+        if ((username == null || username.trim().isEmpty()) || status == null) {
+            throw new IllegalArgumentException("Trainer username or status cannot be null or empty");
+        }
         log.info("Endpoint called: PATCH /trainer?{}&choice={}", username, status);
         String result = trainerService.updateTrainerStatus(status, username);
         log.info("Response: {}", result);

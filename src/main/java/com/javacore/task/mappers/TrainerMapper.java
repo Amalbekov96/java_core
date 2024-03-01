@@ -57,14 +57,14 @@ public class TrainerMapper {
 
     public Trainer update(TrainerUpdateRequest request, Trainer trainer) {
         if (request != null && trainer != null) {
-            trainer.getUser().setUsername(request.userName());
-            trainer.getUser().setFirstName(request.firstName());
-            trainer.getUser().setLastName(request.lastName());
-            Boolean isActive = request.isActive();
+            trainer.getUser().setUsername(request.getUserName());
+            trainer.getUser().setFirstName(request.getFirstName());
+            trainer.getUser().setLastName(request.getLastName());
+            Boolean isActive = request.getIsActive();
             if (isActive == null) {
                 throw new InactiveUserException("Active status cannot be null");
             } else {
-                trainer.getUser().setIsActive(request.isActive());
+                trainer.getUser().setIsActive(request.getIsActive());
             }
 
         }

@@ -29,13 +29,13 @@ public class TrainingServiceImpl implements TrainingService {
     @Transactional
     @Override
     public void saveTraining(TrainingRequest training) {
-        Trainee trainee = traineeRepository.findTraineeByUserUsername(training.traineeUsername()).orElseThrow(
+        Trainee trainee = traineeRepository.findTraineeByUserUsername(training.getTraineeUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: Trainee not found");
                     throw new UserNotFoundException("Trainee not found");
                 }
         );
-        Trainer trainer = trainerRepository.findByUserUsername(training.trainerUsername()).orElseThrow(
+        Trainer trainer = trainerRepository.findByUserUsername(training.getTrainerUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: Trainer not found");
                     throw new UserNotFoundException("Trainer not found");
@@ -45,10 +45,10 @@ public class TrainingServiceImpl implements TrainingService {
         }
         trainee.getTrainers().add(trainer);
         Training savedtraining = Training.builder()
-                .trainingName(training.trainingName())
-                .trainingDate(training.trainingDate())
+                .trainingName(training.getTrainingName())
+                .trainingDate(training.getTrainingDate())
                 .trainingType(trainer.getSpecialization())
-                .trainingDuration(training.duration())
+                .trainingDuration(training.getDuration())
                 .trainer(trainer)
                 .trainee(trainee)
                 .build();
