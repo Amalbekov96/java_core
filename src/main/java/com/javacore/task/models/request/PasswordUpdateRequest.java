@@ -8,10 +8,14 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SignInRequest {
+public class PasswordUpdateRequest {
 
-    @NotBlank(message = "Username cannot be null or empty")
+    @NotBlank(message = "Username cannot be null")
     private String username;
-    @NotBlank(message = "Password cannot be null or empty")
+
+    @NotBlank(message = "Password cannot be null")
     private String password;
+
+    @NotBlank(message = "New password cannot be null")
+    private String newPassword;
 }

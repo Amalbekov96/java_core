@@ -80,7 +80,10 @@ public class TraineeController {
     })
     @GetMapping
     @PreAuthorize("hasAuthority('TRAINEE')")
-    public ResponseEntity<TraineeInfoResponse> getTraineeProfile(@RequestParam("q") String username) {
+    public ResponseEntity<TraineeInfoResponse> getTraineeProfile(@RequestParam("traineeUsername") String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Trainee username cannot be null or empty");
+        }
         log.info("Endpoint called: GET /trainees?q={}", username);
         TraineeInfoResponse traineeGetByNameResponse = traineeService.findTraineeProfileByUsername(username);
         log.info("Response: {}", traineeGetByNameResponse);

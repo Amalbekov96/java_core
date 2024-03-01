@@ -1,5 +1,6 @@
 package com.javacore.task.controllers;
 
+import com.javacore.task.models.request.PasswordUpdateRequest;
 import com.javacore.task.models.request.TraineeRequest;
 import com.javacore.task.models.request.TrainerRequest;
 import com.javacore.task.models.response.SignInResponse;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -28,21 +30,21 @@ public class AuthenticationController {
 
     @Operation(summary = "Trainee Sign Up")
     @PostMapping("/trainee/sign-up")
-    public SignUpResponse traineeSignUp(@RequestBody TraineeRequest request){
+    public SignUpResponse traineeSignUp(@Valid @RequestBody TraineeRequest request){
         log.info("Endpoint called: POST /api/auth/trainee/sign-up");
         return authenticationService.traineeSignUp(request);
     }
 
     @Operation(summary = "Trainer Sign Up")
     @PostMapping("/trainer/sign-up")
-    public SignUpResponse trainerSignUp(@RequestBody TrainerRequest request){
+    public SignUpResponse trainerSignUp(@Valid @RequestBody TrainerRequest request){
         log.info("Endpoint called: POST /api/auth/trainer/sign-up");
         return authenticationService.trainerSignUp(request);
     }
 
     @Operation(summary = "Sign In")
     @PostMapping("/sign-in")
-    public SignInResponse signIn(@RequestBody SignInRequest request){
+    public SignInResponse signIn(@Valid @RequestBody SignInRequest request){
         log.info("Endpoint called: POST /api/auth/sign-in");
         return authenticationService.signIn(request);
     }
@@ -55,9 +57,9 @@ public class AuthenticationController {
             @ApiResponse(responseCode = "400", description = "User can change only his password"),
             @ApiResponse(responseCode = "400", description = "Wrong password"),
     })
-    public ResponseEntity<String> updateLogin(@RequestParam String username, @RequestParam("password") String password, @RequestParam("newPassword") String newPassword) {
-        log.info("Endpoint called: POST /trainers?{}", username);
-        authenticationService.changePassword(username, password, newPassword);
+    public ResponseEntity<String> updateLogin(@Valid @RequestBody PasswordUpdateRequest request) {
+        log.info("Endpoint called: POST /trainers?{}", request.getUsername());
+        authenticationService.changePassword(request.getUsername(), request.getPassword(), request.getNewPassword());
         return new ResponseEntity<>("password successfully updated!", HttpStatus.OK);
     }
 

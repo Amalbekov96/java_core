@@ -46,13 +46,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public SignUpResponse traineeSignUp(TraineeRequest request) {
         log.info("Trainee sign up request: {}", request);
-        String username = profileService.generateUsername(request.firstName(), request.lastName());
+        String username = profileService.generateUsername(request.getFirstName(), request.getLastName());
         log.info("Username generated: {}", username);
         String password = profileService.generateRandomPassword();
         log.info("Password generated: {}", password);
         User user = User.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .username(username)
                 .role(UserRole.TRAINEE)
                 .password(passwordEncoder.encode(password))
@@ -62,8 +62,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         userRepository.save(user);
 
         Trainee trainee = Trainee.builder()
-                .address(request.address())
-                .dateOfBirth(request.dateOfBirth())
+                .address(request.getAddress())
+                .dateOfBirth(request.getDateOfBirth())
                 .user(user)
                 .build();
         log.info("Trainee created: {}", trainee);
@@ -84,11 +84,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public SignUpResponse trainerSignUp(TrainerRequest request) {
 
-        String username = profileService.generateUsername(request.firstName(), request.lastName());
+        String username = profileService.generateUsername(request.getFirstName(), request.getLastName());
         String password = profileService.generateRandomPassword();
         User user = User.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .username(username)
                 .role(UserRole.TRAINER)
                 .isActive(true)
@@ -96,7 +96,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .build();
         userRepository.save(user);
 
-        TrainingType trainingType = trainingTypeRepository.findById(request.specialization().getId()).orElseThrow(
+        TrainingType trainingType = trainingTypeRepository.findById(request.getSpecialization().getId()).orElseThrow(
                 () -> {
                     log.warn("Response: Training type not found");
                     return new EntityNotFoundException("Training type not found");
@@ -143,17 +143,17 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public SignInResponse signIn(SignInRequest request) {
 
-        if (request.username().isBlank() || request.password().isBlank()) {
+        if (request.getUsername().isBlank() || request.getPassword().isBlank()) {
             throw new BadCredentialsException("Username or password is blank");
         }
-        User user = userRepository.findUserByUsername(request.username()).orElseThrow(
+        User user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: User not found");
                     return new EntityNotFoundException("User not found");
                 }
         );
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             log.warn("Response: Wrong password");
                 throw new BadCredentialsException("wrong credentials");
             }
