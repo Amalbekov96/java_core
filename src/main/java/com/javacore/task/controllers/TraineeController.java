@@ -132,7 +132,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "200", description = "Successfully updated trainee trainers list"),
             @ApiResponse(responseCode = "404", description = "Trainers not found")
     })
-    @PutMapping("/update-trainers")
+    @PutMapping("/trainers")
     public ResponseEntity<List<TrainersListResponse>> updateTraineeTrainersList(@RequestParam("username") String username, @RequestBody List<String> trainersUsernames) {
         if ((username == null || username.trim().isEmpty()) || trainersUsernames.isEmpty()) {
             throw new IllegalArgumentException("Trainee username or trainers usernames list cannot be null or empty");
@@ -148,7 +148,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved trainee trainings list"),
             @ApiResponse(responseCode = "404", description = "Trainings not found")
     })
-    @PostMapping("/trainee-trainings")
+    @GetMapping("/trainings")
     @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
     public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
         log.info("Endpoint called: POST trainee-trainings, Request: {}", request);

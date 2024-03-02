@@ -95,7 +95,7 @@ public class TrainerController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Trainer trainings"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
-    @GetMapping("/trainer-trainings")
+    @GetMapping("/trainings")
     public ResponseEntity<List<TrainerTrainingInfoResponse>> getTrainerTrainingsList(@Valid @RequestBody TrainerTrainingsRequest request) {
         log.info("Endpoint called: GET /trainer-trainings, Request: {}", request);
         List<TrainerTrainingInfoResponse> responses = trainerService.getTrainerTrainingsByCriteria(request);
