@@ -1,9 +1,11 @@
 package com.javacore.task.service;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
 import com.javacore.task.entities.User;
+import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TrainerMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.request.TrainerTrainingsRequest;
@@ -107,4 +109,88 @@ public class TrainerServiceTest {
         assertEquals(0, result.size());
     }
 
+
+
+    @Test
+    void testGetTrainerById_TrainerNotFound() {
+        Long trainerId = 1L;
+        when(trainerRepository.findById(trainerId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerById(trainerId));
+    }
+
+    @Test
+    void testUpdateTrainer_TrainerNotFound() {
+        TrainerUpdateRequest request = new TrainerUpdateRequest(
+                "Kushtar.Amalbekov",
+                "John",
+                "Yoki",
+                true
+        );
+        when(trainerRepository.findByUserUsername(request.getUserName())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.updateTrainer(request));
+    }
+
+    @Test
+    void testFindTrainerProfileByUsername_TrainerNotFound() {
+        String username = "Kushtar.Amalbekov";
+        when(trainerRepository.findByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.findTrainerProfileByUsername(username));
+    }
+
+    @Test
+    void testGetTrainerTrainingsByCriteria_TrainerNotFound() {
+        TrainerTrainingsRequest request = new TrainerTrainingsRequest(
+                "Eulan.Ibraimov",
+                null,
+                null,
+                "Kanysh.Abdyrakmanova"
+        );
+        when(trainerRepository.existsByUserUsername(request.getUsername())).thenReturn(false);
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerTrainingsByCriteria(request));
+    }
+
+
+
+    @Test
+    void testUpdateTrainerStatus_TrainerNotFound() {
+        String username = "Kushtar.Amalbekov";
+        boolean status = true;
+        when(trainerRepository.findByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.updateTrainerStatus(status, username));
+    }
+
+    @Test
+    void testUpdateTrainerStatus_TrainerAlreadyInDesiredState() {
+        String username = "Kushtar.Amalbekov";
+        boolean status = true;
+        Trainer trainer = new Trainer();
+        trainer.setUser(new User()); // Initialize the User object
+        trainer.getUser().setIsActive(true);
+        when(trainerRepository.findByUserUsername(username)).thenReturn(Optional.of(trainer));
+
+        assertThrows(IllegalArgumentException.class, () -> trainerService.updateTrainerStatus(status, username));
+    }
+    @Test
+    void testGetTrainerTrainingsByCriteria_TrainingsNotFound() {
+        TrainerTrainingsRequest request = new TrainerTrainingsRequest(
+                "Eulan.Ibraimov",
+                null,
+                null,
+                "Kanysh.Abdyrakmanova"
+        );
+        when(trainerRepository.existsByUserUsername(request.getUsername())).thenReturn(true);
+        when(trainerRepository.getTrainerTrainingsByCriteria(
+                eq(request.getUsername()),
+                eq(request.getPeriodFrom()),
+                eq(request.getPeriodTo()),
+                eq(request.getTraineeName())
+        )).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainerService.getTrainerTrainingsByCriteria(request));
+    }
 }

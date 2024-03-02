@@ -5,6 +5,7 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.TrainingTypes;
+import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.TraineeModel;
@@ -198,6 +199,75 @@ public class TraineeServiceTest {
         assertEquals(expectedResponse, actualResponse);
 
     }
+
+
+    @Test
+    void testGetTraineeById_TraineeNotFound() {
+        long traineeId = 1L;
+        when(traineeRepository.findById(traineeId)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeById(traineeId));
+    }
+
+    @Test
+    void testUpdateTrainee_TraineeNotFound() {
+        TraineeUpdateRequest request = new TraineeUpdateRequest(
+                "Eldiyar.Toktomamatov","Erlan", "Artelev",new Date(),"Tokmok"   ,true);
+        when(traineeRepository.findTraineeByUserUsername(request.getUserName())).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainee(request));
+    }
+
+    @Test
+    void testDeleteTrainee_TraineeNotFound() {
+        String username = "Eldiyar.Toktomamatov";
+        when(traineeRepository.findTraineeByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.deleteTrainee(username));
+    }
+
+    @Test
+    void testFindTraineeProfileByUsername_TraineeNotFound() {
+        String username = "Kanysh.Abdyrakmanova";
+        when(traineeRepository.findTraineeByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.findTraineeProfileByUsername(username));
+    }
+
+    @Test
+    void testUpdateTraineeStatus_TraineeNotFound() {
+        String username = "Kanysh.Abdyrakmanova";
+        boolean status = false;
+        when(traineeRepository.findTraineeByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.updateTraineeStatus(status, username));
+    }
+
+    @Test
+    void testUpdateTraineeTrainersList_TraineeNotFound() {
+        String username = "Kanysh.Abdyrakmanova";
+        when(traineeRepository.findTraineeByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.updateTraineeTrainersList(username, null));
+    }
+
+    @Test
+    void testGetNotAssignedActiveTrainersListForTrainee_TraineeNotFound() {
+        String username = "Kanysh.Abdyrakmanova";
+        when(traineeRepository.findTraineeByUserUsername(username)).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.getNotAssignedActiveTrainersListForTrainee(username));
+    }
+
+    @Test
+    void testGetTraineeTrainingsByCriteria_TraineeNotFound() {
+        TraineeTrainingsRequest request = new TraineeTrainingsRequest(
+                "Kairat.Uzenov","Aiperi.Adylova", "WEIGHT_LIFTING",null, null);
+        when(traineeRepository.existsByUserUsername(request.getTraineeName())).thenReturn(false);
+
+        assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeTrainingsByCriteria(request));
+    }
+
 }
 
 
