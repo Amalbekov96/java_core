@@ -89,19 +89,19 @@ public class TrainerServiceTest {
         List<Training> trainings = Collections.singletonList(new Training());
 
         when(trainerRepository.getTrainerTrainingsByCriteria(
-                eq(request.username()),
-                eq(request.periodFrom()),
-                eq(request.periodTo()),
-                eq(request.traineeName())
+                eq(request.getUsername()),
+                eq(request.getPeriodFrom()),
+                eq(request.getPeriodTo()),
+                eq(request.getTraineeName())
         )).thenReturn(Optional.of(trainings));
 
         List<TrainerTrainingInfoResponse> result = trainerService.getTrainerTrainingsByCriteria(request);
 
         verify(trainerRepository, times(1)).getTrainerTrainingsByCriteria(
-                eq(request.username()),
-                eq(request.periodFrom()),
-                eq(request.periodTo()),
-                eq(request.traineeName())
+                eq(request.getUsername()),
+                eq(request.getPeriodFrom()),
+                eq(request.getPeriodTo()),
+                eq(request.getTraineeName())
         );
 
         assertEquals(0, result.size());

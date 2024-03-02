@@ -72,7 +72,7 @@ public class TraineeServiceTest {
         TraineeUpdateRequest request = new TraineeUpdateRequest(
                 "Eldiyar.Toktomamatov","Erlan", "Artelev",new Date(),"Tokmok"   ,true);
         Trainee existingTrainee = new Trainee();
-        when(traineeRepository.findTraineeByUserUsername(request.userName())).thenReturn(java.util.Optional.of(existingTrainee));
+        when(traineeRepository.findTraineeByUserUsername(request.getUserName())).thenReturn(java.util.Optional.of(existingTrainee));
         Trainee updatedTrainee = new Trainee();
         when(traineeMapper.update(request, existingTrainee)).thenReturn(updatedTrainee);
         TraineeProfileUpdateResponse expectedResponse = new TraineeProfileUpdateResponse();
