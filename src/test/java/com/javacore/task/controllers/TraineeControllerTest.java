@@ -3,6 +3,7 @@ package com.javacore.task.controllers;
 import com.javacore.task.models.request.*;
 import com.javacore.task.models.response.*;
 import com.javacore.task.services.TraineeService;
+import io.micrometer.core.instrument.Counter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,8 @@ class TraineeControllerTest {
     @InjectMocks
     private TraineeController traineeController;
 
+    @Mock
+    private Counter counter;
     @BeforeEach
     public void setup() {
         MockitoAnnotations.initMocks(this);

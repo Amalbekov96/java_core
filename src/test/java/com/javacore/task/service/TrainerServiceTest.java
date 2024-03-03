@@ -31,7 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 
 @ExtendWith(MockitoExtension.class)
-public class TrainerServiceTest {
+ class TrainerServiceTest {
     @Mock
     private TrainerRepository trainerRepository;
 

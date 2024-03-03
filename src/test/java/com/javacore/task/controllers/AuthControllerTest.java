@@ -9,16 +9,18 @@ import com.javacore.task.models.request.TrainerRequest;
 import com.javacore.task.models.response.SignInResponse;
 import com.javacore.task.models.response.SignUpResponse;
 import com.javacore.task.services.AuthenticationService;
+import io.micrometer.core.instrument.Counter;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 import java.util.Date;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
 
 @Transactional
 class AuthControllerTest {
@@ -27,6 +29,9 @@ class AuthControllerTest {
 
     @InjectMocks
     private AuthenticationController authController;
+
+    @Mock
+    private Counter counter;
 
     @BeforeEach
     void setUp() {
