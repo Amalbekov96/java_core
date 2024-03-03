@@ -94,7 +94,6 @@ class TraineeControllerTest {
         assertEquals("Deactivated", response.getBody());
     }
 
-
     @Test
     void testGetNotAssignedTrainersForTrainee() {
 

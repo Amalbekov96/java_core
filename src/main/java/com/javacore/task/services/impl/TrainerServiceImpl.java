@@ -13,7 +13,9 @@ import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
+import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
+import com.javacore.task.repositories.TrainingRepository;
 import com.javacore.task.services.TrainerService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,8 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerMapper trainerMapper;
     private final TrainerRepository trainerRepository;
+    private final TrainingRepository trainingRepository;
+    private final TraineeRepository traineeRepository;
     private final TrainingMapper trainingDTOMapper;
 
     @Override

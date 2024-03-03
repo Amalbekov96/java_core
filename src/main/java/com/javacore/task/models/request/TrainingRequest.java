@@ -1,7 +1,9 @@
 package com.javacore.task.models.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,10 +23,10 @@ public class TrainingRequest {
     @NotBlank(message = "Training name cannot be null or empty")
     private String trainingName;
 
-    @NotBlank(message = "Training date cannot be null or empty")
+    @NotNull(message = "Training date cannot be null or empty")
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date trainingDate;
 
-    @NotBlank(message = "Training duration cannot be null")
+    @NotNull(message = "Training duration cannot be null")
     private Number duration;
 }

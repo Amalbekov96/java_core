@@ -35,4 +35,14 @@ public class Trainee {
 
     @OneToMany(mappedBy = "trainee", cascade = {CascadeType.REMOVE, CascadeType.DETACH, CascadeType.REFRESH, CascadeType.PERSIST}, fetch = FetchType.EAGER)
     private List<Training> trainings;
+
+    @Override
+    public String toString() {
+        return "Trainee{" +
+                "traineeId=" + traineeId +
+                ", dateOfBirth=" + dateOfBirth +
+                ", address='" + address + '\'' +
+                ", user=" + user +
+                '}';
+    }
 }

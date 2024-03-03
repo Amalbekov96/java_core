@@ -25,4 +25,12 @@ public class TrainingType {
     public TrainingType(TrainingTypes trainingType) {
         this.trainingType = trainingType;
     }
+
+    @Override
+    public String toString() {
+        return "TrainingType{" +
+                "id=" + id +
+                ", trainingType=" + trainingType +
+                '}';
+    }
 }

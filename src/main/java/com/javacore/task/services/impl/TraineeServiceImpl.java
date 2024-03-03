@@ -9,13 +9,13 @@ import com.javacore.task.exceptions.ApiException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
-import com.javacore.task.models.*;
-import com.javacore.task.models.response.TraineeProfileUpdateResponse;
+import com.javacore.task.models.response.TraineeInfoResponse;
+import com.javacore.task.models.TraineeModel;
 import com.javacore.task.models.request.TraineeTrainingsRequest;
 import com.javacore.task.models.request.TraineeUpdateRequest;
-import com.javacore.task.models.response.TraineeInfoResponse;
-import com.javacore.task.models.response.TrainersListResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.response.TraineeTrainingInfoResponse;
+import com.javacore.task.models.response.TrainersListResponse;
 import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingRepository;
@@ -48,6 +48,7 @@ public class TraineeServiceImpl implements TraineeService {
     public TraineeModel getTraineeById(Long traineeId) {
         Trainee trainee = traineeRepository.findById(traineeId).orElseThrow(
                 () -> new UserNotFoundException(String.format("Trainee with id: %d not found", traineeId)));
+        log.info("Retrieved Trainee by id: {}, Trainee: {}", traineeId, trainee);
         if(trainee != null) {
             return traineeMapper.traineeToTraineeModel(trainee);
         } else {
@@ -77,18 +78,17 @@ public class TraineeServiceImpl implements TraineeService {
                     () -> new UserNotFoundException(String.format("Trainee with username: %s not found", username)));
             traineeRepository.deleteById(trainee.getTraineeId());
             log.info("Trainee deleted with id: {}", trainee.getTraineeId());
-
     }
 
-        @Override
-        public TraineeInfoResponse findTraineeProfileByUsername(String username) {
-            Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
-                log.warn("Response: Trainee not found");
-                throw  new UserNotFoundException("Trainee not found");
-            });
-            log.info("Retrieved Trainee profile by username: {}, Trainee: {}", username, trainee);
-            return traineeMapper.traineeInfoResponse(trainee);
-        }
+    @Override
+    public TraineeInfoResponse findTraineeProfileByUsername(String username) {
+        Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
+            log.warn("Response: Trainee not found");
+            throw  new UserNotFoundException("Trainee not found");
+        });
+        log.info("Retrieved Trainee profile by username: {}, Trainee: {}", username, trainee);
+        return traineeMapper.traineeInfoResponse(trainee);
+    }
 
 
     @Transactional
@@ -169,6 +169,7 @@ public class TraineeServiceImpl implements TraineeService {
 
     @Override
     public List<TraineeTrainingInfoResponse> getTraineeTrainingsByCriteria(TraineeTrainingsRequest request) {
+
         log.info("Retrieving Trainee Trainings by : Criteria: {}", request);
         if (traineeRepository.existsByUserUsername(request.getTraineeName())) {
             List<Training> trainings = traineeRepository.getTraineeTrainingsByCriteria(request.getTraineeName(),

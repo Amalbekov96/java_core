@@ -2,6 +2,8 @@ package com.javacore.task.controllers;
 
 import com.javacore.task.models.request.TrainingRequest;
 import com.javacore.task.services.TrainingService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -16,6 +18,7 @@ import java.io.IOException;
 
 @Slf4j
 @RestController
+@Timed
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainings")
 @RequiredArgsConstructor
@@ -23,6 +26,7 @@ import java.io.IOException;
 public class TrainingController {
 
     private final TrainingService trainingService;
+    private final Counter counter;
 
     @Operation(summary = "Save training")
     @PostMapping
@@ -30,6 +34,7 @@ public class TrainingController {
         log.info("Endpoint called: POST /training, Request: {}", training);
         trainingService.saveTraining(training);
         log.info("Response: saved successfully");
+        counter.increment();
         return new ResponseEntity<>("saved successfully", HttpStatus.OK);
     }
 

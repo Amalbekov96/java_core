@@ -10,7 +10,6 @@ import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
-import com.javacore.task.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 public class TraineeMapper {
 
     private final UserMapper userMapper;
-    private final UserRepository userRepository;
 
     public TraineeModel traineeToTraineeModel(Trainee trainee) {
         TraineeModel traineeModel = new TraineeModel();

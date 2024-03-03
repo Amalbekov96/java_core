@@ -8,6 +8,8 @@ import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.models.response.TrainersListResponse;
 import com.javacore.task.services.TraineeService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
+@Timed
 @RestController
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainees")
@@ -31,6 +34,7 @@ import java.util.List;
 public class TraineeController {
 
     private final TraineeService traineeService;
+    private final Counter counter;
 
     @Operation(description = "Get Trainee by ID")
     @ApiResponses(value = {
@@ -43,6 +47,7 @@ public class TraineeController {
         log.info("Endpoint called: GET /trainees/{}", traineeId);
         TraineeModel traineeModel = traineeService.getTraineeById(traineeId);
         log.info("Response: {}", traineeModel);
+        counter.increment();
         return ResponseEntity.ok(traineeModel);
     }
 
@@ -57,6 +62,7 @@ public class TraineeController {
         log.info("Endpoint called: PUT /trainees Request: {}", request);
         TraineeProfileUpdateResponse updatedTrainee = traineeService.updateTrainee(request);
         log.info("Response: {}", updatedTrainee);
+        counter.increment();
         return ResponseEntity.ok(updatedTrainee);
     }
     @Operation(description = "Delete Trainee")
@@ -72,6 +78,7 @@ public class TraineeController {
         log.info("Endpoint called: DELETE /trainees?username={}", username);
         traineeService.deleteTrainee(username);
         log.info("Response: deleted successfully");
+        counter.increment();
         return new ResponseEntity<>("deleted successfully", HttpStatus.OK);
     }
 
@@ -81,6 +88,7 @@ public class TraineeController {
             @ApiResponse(responseCode = "404", description = "Trainee not found")
     })
     @GetMapping
+    @Timed(value = "get.trainee.profile")
     @PreAuthorize("hasAuthority('TRAINEE')")
     public ResponseEntity<TraineeInfoResponse> getTraineeProfile(@RequestParam("traineeUsername") String username) {
         if (username == null || username.trim().isEmpty()) {
@@ -89,6 +97,7 @@ public class TraineeController {
         log.info("Endpoint called: GET /trainees?q={}", username);
         TraineeInfoResponse traineeGetByNameResponse = traineeService.findTraineeProfileByUsername(username);
         log.info("Response: {}", traineeGetByNameResponse);
+        counter.increment();
         return new ResponseEntity<>(traineeGetByNameResponse, HttpStatus.OK);
     }
 
@@ -106,6 +115,7 @@ public class TraineeController {
         log.info("Endpoint called: PATCH /trainees?username={}&choice={}", username, status);
         String result = traineeService.updateTraineeStatus(status, username);
         log.info("Response: {}", result);
+        counter.increment();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -124,6 +134,7 @@ public class TraineeController {
         log.info("Endpoint called: GET /not-assigned-trainers?username={}", username);
         List<TrainersListResponse> responses = traineeService.getNotAssignedActiveTrainersListForTrainee(username);
         log.info("Response: {}", responses);
+        counter.increment();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
@@ -140,6 +151,7 @@ public class TraineeController {
         log.info("Endpoint called: PUT /update-trainers?username={}, REQUEST: trainersUsernames={}", username, trainersUsernames);
         List<TrainersListResponse> responses = traineeService.updateTraineeTrainersList(username, trainersUsernames);
         log.info("Response: {}", responses);
+        counter.increment();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 
@@ -148,12 +160,13 @@ public class TraineeController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved trainee trainings list"),
             @ApiResponse(responseCode = "404", description = "Trainings not found")
     })
-    @GetMapping("/trainings")
+    @PostMapping("/trainings")
     @PreAuthorize("hasAnyAuthority('TRAINEE','TRAINER')")
     public ResponseEntity<List<TraineeTrainingInfoResponse>> getTraineeTrainingsList(@Valid @RequestBody TraineeTrainingsRequest request) {
         log.info("Endpoint called: POST trainee-trainings, Request: {}", request);
         List<TraineeTrainingInfoResponse> responses = traineeService.getTraineeTrainingsByCriteria(request);
         log.info("Response: {}", responses);
+        counter.increment();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 }
