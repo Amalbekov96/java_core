@@ -81,7 +81,7 @@ public class TrainerMapper {
                         trainee.getUser().getUsername(),
                         trainee.getUser().getFirstName(),
                         trainee.getUser().getLastName()
-                )).collect(Collectors.toList()));
+                )).toList());
     }
     public TrainerUpdateResponse trainerToTrainerUpdateResponse(Trainer trainer) {
         return TrainerUpdateResponse.builder()
@@ -95,7 +95,7 @@ public class TrainerMapper {
                                 trainee.getUser().getUsername(),
                                 trainee.getUser().getFirstName(),
                                 trainee.getUser().getLastName()
-                )).collect(Collectors.toList()))
+                )).toList())
                 .build();
 
     }

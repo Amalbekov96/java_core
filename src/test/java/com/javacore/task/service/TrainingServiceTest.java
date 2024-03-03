@@ -23,8 +23,9 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
-public class TrainingServiceTest {
+class TrainingServiceTest {
 
     @Mock
     private TrainingRepository trainingDao;
@@ -39,7 +40,7 @@ public class TrainingServiceTest {
     private TrainingServiceImpl trainingService;
 
     @Test
-    void testAddTraining(){
+    void testAddTraining() {
         TrainingRequest trainingRequest = new TrainingRequest(
                 "Kanysh.Abdyrakmanova1",
                 "Aiperi.Adylova",

@@ -21,13 +21,13 @@ import java.util.Collections;
 @RequiredArgsConstructor
 public class HealthEndpoint implements HealthIndicator {
 
-    private static final String apiHost= "localhost";
+    private static final String API_HOST = "localhost";
 
-    private static final String apiPort = "9091";
+    private static final String API_PORT = "9091";
 
     private final RestTemplate restTemplate;
 
-    public static final String BASE_URL = "http://" + apiHost + ":" + apiPort;
+    public static final String BASE_URL = "http://" + API_HOST + ":" + API_PORT;
     private static final String ENDPOINT_SIGN_UP_TRAINEE = "/api/v1/auth/trainee/sign-up";
     private static final String ENDPOINT_SIGN_UP_TRAINER = "/api/v1/auth/trainer/sign-up";
     public static final String ENDPOINT_SIGN_IN = "/api/v1/auth/sign-in";
@@ -131,7 +131,7 @@ public class HealthEndpoint implements HealthIndicator {
         if (requestBody == null) {
             return new HttpEntity<>(headers);
         }
-        log.info(BASE_URL + endpointUrl, apiHost, apiPort);
+        log.info(BASE_URL + endpointUrl, API_HOST, API_PORT);
         return new HttpEntity<>(requestBody, headers);
     }
     public SignInResponse obtainAuthToken() {

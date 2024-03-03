@@ -9,7 +9,7 @@ import org.mockito.Mockito;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-public class ProfileServiceImplTest {
+class ProfileServiceImplTest {
 
     private UserRepository userRepository;
     private ProfileServiceImpl profileService;
@@ -21,7 +21,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    public void testGenerateUsername() {
+    void testGenerateUsername() {
         String firstName = "John";
         String lastName = "Doe";
         String baseUsername = firstName + "." + lastName;
@@ -35,7 +35,7 @@ public class ProfileServiceImplTest {
     }
 
     @Test
-    public void testGenerateRandomPassword() {
+    void testGenerateRandomPassword() {
         String password = profileService.generateRandomPassword();
 
         assertEquals(ProfileServiceImpl.PASSWORD_LENGTH, password.length());

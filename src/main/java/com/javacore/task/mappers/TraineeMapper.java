@@ -70,8 +70,7 @@ public class TraineeMapper {
 
     public List<TrainersListResponse> mapTraineesTrainersToDto(List<Trainer> trainers) {
         return trainers.stream()
-                .map(this::mapTrainerToDto)
-                .collect(Collectors.toList());
+                .map(this::mapTrainerToDto).toList();
     }
 
     private TrainersListResponse mapTrainerToDto(Trainer trainer) {
@@ -95,8 +94,7 @@ public class TraineeMapper {
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingType().name()
-                        ))
-                        .collect(Collectors.toList()));
+                        )).toList();
     }
 
     public TraineeProfileUpdateResponse traineeToTraineeResponse(Trainee existingTrainee) {
@@ -113,8 +111,7 @@ public class TraineeMapper {
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingType().name()
-                        ))
-                        .collect(Collectors.toList())
+                        )).toList()
         );
     }
 }

@@ -119,7 +119,7 @@ public class TraineeServiceImpl implements TraineeService {
     public List<TrainersListResponse> updateTraineeTrainersList(String username, List<String> trainersUsernames) {
          Trainee trainee = traineeRepository.findTraineeByUserUsername(username).orElseThrow(()->{
              log.warn("Response: Trainee not found");
-             throw  new UserNotFoundException("Trainee not found");
+             return new UserNotFoundException("Trainee not found");
          });
          List<Trainer> trainers = traineeRepository.getNotAssignedTrainers(trainee.getUser().getUsername());
          List<Trainer> addedTrainers= trainerRepository.findTrainersByUserUserName(trainersUsernames);
@@ -153,7 +153,7 @@ public class TraineeServiceImpl implements TraineeService {
                          trainer.getUser().getFirstName(),
                          trainer.getUser().getLastName(),
                          trainer.getSpecialization().getTrainingType().name()
-                 )).distinct().collect(Collectors.toList());
+                 )).distinct().toList();
         }
 
     @Override

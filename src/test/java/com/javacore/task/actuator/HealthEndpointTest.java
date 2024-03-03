@@ -17,7 +17,7 @@ import java.net.URI;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class HealthEndpointTest {
+class HealthEndpointTest {
     @Mock
     private RestTemplate restTemplate;
 
@@ -112,7 +112,7 @@ public class HealthEndpointTest {
                         Mockito.eq(HttpMethod.POST),
                         Mockito.any(HttpEntity.class),
                         Mockito.eq(SignInResponse.class)))
-                .thenReturn(new ResponseEntity<>(new SignInResponse("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJLdXNodGFyLkFtYWxiZWtvdiIsImlhdCI6MTcwODc1MzAzNSwiZXhwIjoxNzA4NzU0NDc1fQ.kjwtnT9VtBzC9sOMKNJQ_9ZVyde2ZT0lpduPa8XZ81E","",UserRole.TRAINER), HttpStatus.OK));
+                .thenReturn(new ResponseEntity<>(new SignInResponse("eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJLdXNodGFyLkFtYWxiZWtvdiIsImlhdCI6MTcwODc1MzAzNSwiZXhwIjoxNzA4NzU0NDc1fQ.kjwtnT9VtBzC9sOMKNJQ_9ZVyde2ZT0lpduPa8XZ81E", "", UserRole.TRAINER), HttpStatus.OK));
         Mockito.when(restTemplate.exchange(Mockito.anyString(), Mockito.eq(healthEndpoint.getHttpMethod(endpointType)), Mockito.any(), Mockito.eq(String.class)))
                 .thenReturn(new ResponseEntity<>("", HttpStatus.OK));
 

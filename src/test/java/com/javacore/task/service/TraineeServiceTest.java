@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
-public class TraineeServiceTest {
+class TraineeServiceTest {
 
     @Mock
     private TraineeRepository traineeRepository;
@@ -71,7 +71,7 @@ public class TraineeServiceTest {
     void testUpdateTrainee() {
 
         TraineeUpdateRequest request = new TraineeUpdateRequest(
-                "Eldiyar.Toktomamatov","Erlan", "Artelev",new Date(),"Tokmok"   ,true);
+                "Eldiyar.Toktomamatov", "Erlan", "Artelev", new Date(), "Tokmok", true);
         Trainee existingTrainee = new Trainee();
         when(traineeRepository.findTraineeByUserUsername(request.getUserName())).thenReturn(java.util.Optional.of(existingTrainee));
         Trainee updatedTrainee = new Trainee();
@@ -149,7 +149,7 @@ public class TraineeServiceTest {
 
         verify(traineeRepository, times(1)).save(trainee);
         assertNotNull(result);
-        assertEquals(0,result.size());
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -173,6 +173,7 @@ public class TraineeServiceTest {
         assertEquals(expectedResponse, actualResponse);
 
     }
+
     @Test
     void testGetTraineeTrainingsByCriteria() {
 
@@ -180,12 +181,12 @@ public class TraineeServiceTest {
         Date periodTo = java.sql.Date.valueOf(LocalDate.now());
         Date date = java.sql.Date.valueOf(LocalDate.of(2024, 2, 12));
         TraineeTrainingsRequest request = new TraineeTrainingsRequest(
-                "Kairat.Uzenov","Aiperi.Adylova", TrainingTypes.WEIGHT_LIFTING.name(),periodFrom, periodTo);
+                "Kairat.Uzenov", "Aiperi.Adylova", TrainingTypes.WEIGHT_LIFTING.name(), periodFrom, periodTo);
         List<Training> trainings = new ArrayList<>();
         when(traineeRepository.getTraineeTrainingsByCriteria(
                 anyString(), any(Date.class), any(Date.class), anyString(), any(TrainingTypes.class)
         )).thenReturn(Optional.of(trainings));
-        TraineeTrainingInfoResponse response = new TraineeTrainingInfoResponse("thirdOne",date,"WEIGHT_LIFTING",8,"Kairat.Uzenov");
+        TraineeTrainingInfoResponse response = new TraineeTrainingInfoResponse("thirdOne", date, "WEIGHT_LIFTING", 8, "Kairat.Uzenov");
         List<TraineeTrainingInfoResponse> expectedResponse = new ArrayList<>();
         expectedResponse.add(response);
         when(trainingMapper.mapTraineeTrainingsToDto(trainings)).thenReturn(expectedResponse);
@@ -212,7 +213,7 @@ public class TraineeServiceTest {
     @Test
     void testUpdateTrainee_TraineeNotFound() {
         TraineeUpdateRequest request = new TraineeUpdateRequest(
-                "Eldiyar.Toktomamatov","Erlan", "Artelev",new Date(),"Tokmok"   ,true);
+                "Eldiyar.Toktomamatov", "Erlan", "Artelev", new Date(), "Tokmok", true);
         when(traineeRepository.findTraineeByUserUsername(request.getUserName())).thenReturn(Optional.empty());
 
         assertThrows(UserNotFoundException.class, () -> traineeService.updateTrainee(request));
@@ -262,7 +263,7 @@ public class TraineeServiceTest {
     @Test
     void testGetTraineeTrainingsByCriteria_TraineeNotFound() {
         TraineeTrainingsRequest request = new TraineeTrainingsRequest(
-                "Kairat.Uzenov","Aiperi.Adylova", "WEIGHT_LIFTING",null, null);
+                "Kairat.Uzenov", "Aiperi.Adylova", "WEIGHT_LIFTING", null, null);
         when(traineeRepository.existsByUserUsername(request.getTraineeName())).thenReturn(false);
 
         assertThrows(UserNotFoundException.class, () -> traineeService.getTraineeTrainingsByCriteria(request));
