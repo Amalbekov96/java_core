@@ -11,6 +11,7 @@ import com.javacore.task.mappers.TrainingMapper;
 import com.javacore.task.models.request.TrainerTrainingsRequest;
 import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
+import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.services.impl.TrainerServiceImpl;
 import jakarta.transaction.Transactional;
@@ -34,16 +35,10 @@ import static org.mockito.ArgumentMatchers.eq;
  class TrainerServiceTest {
     @Mock
     private TrainerRepository trainerRepository;
-
-    @Mock
-    private TrainerMapper trainerMapper;
-
     @InjectMocks
     private TrainerServiceImpl trainerService;
-
     @Mock
-    private TrainingMapper trainingDTOMapper;
-
+    private TrainingMapper trainingMapper;
     @Test
     @Transactional
     void testUpdateTrainer() {
@@ -96,6 +91,7 @@ import static org.mockito.ArgumentMatchers.eq;
                 eq(request.getPeriodTo()),
                 eq(request.getTraineeName())
         )).thenReturn(Optional.of(trainings));
+        when(trainerRepository.existsByUserUsername(request.getUsername())).thenReturn(true);
 
         List<TrainerTrainingInfoResponse> result = trainerService.getTrainerTrainingsByCriteria(request);
 

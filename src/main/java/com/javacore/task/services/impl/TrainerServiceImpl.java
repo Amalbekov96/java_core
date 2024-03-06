@@ -32,8 +32,6 @@ public class TrainerServiceImpl implements TrainerService {
 
     private final TrainerMapper trainerMapper;
     private final TrainerRepository trainerRepository;
-    private final TrainingRepository trainingRepository;
-    private final TraineeRepository traineeRepository;
     private final TrainingMapper trainingDTOMapper;
 
     @Override

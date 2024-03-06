@@ -94,7 +94,7 @@ public class TraineeMapper {
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingType().name()
-                        )).toList();
+                        )).toList());
     }
 
     public TraineeProfileUpdateResponse traineeToTraineeResponse(Trainee existingTrainee) {

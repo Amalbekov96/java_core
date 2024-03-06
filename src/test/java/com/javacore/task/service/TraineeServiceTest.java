@@ -5,6 +5,7 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.TrainingTypes;
+import com.javacore.task.enums.UserRole;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.mappers.TraineeMapper;
 import com.javacore.task.mappers.TrainingMapper;
@@ -177,11 +178,11 @@ class TraineeServiceTest {
     @Test
     void testGetTraineeTrainingsByCriteria() {
 
-        Date periodFrom = java.sql.Date.valueOf(LocalDate.of(2024, 2, 1));
+        Date periodFrom = java.sql.Date.valueOf(LocalDate.of(2024, 1, 1));
         Date periodTo = java.sql.Date.valueOf(LocalDate.now());
-        Date date = java.sql.Date.valueOf(LocalDate.of(2024, 2, 12));
+        Date date = java.sql.Date.valueOf(LocalDate.of(2024, 4, 12));
         TraineeTrainingsRequest request = new TraineeTrainingsRequest(
-                "Kairat.Uzenov", "Aiperi.Adylova", TrainingTypes.WEIGHT_LIFTING.name(), periodFrom, periodTo);
+                "Eldiyar.Toktomamatov", "Aiperi.Adylova", TrainingTypes.WEIGHT_LIFTING.name(), periodFrom, periodTo);
         List<Training> trainings = new ArrayList<>();
         when(traineeRepository.getTraineeTrainingsByCriteria(
                 anyString(), any(Date.class), any(Date.class), anyString(), any(TrainingTypes.class)
@@ -190,6 +191,8 @@ class TraineeServiceTest {
         List<TraineeTrainingInfoResponse> expectedResponse = new ArrayList<>();
         expectedResponse.add(response);
         when(trainingMapper.mapTraineeTrainingsToDto(trainings)).thenReturn(expectedResponse);
+
+        when(traineeRepository.existsByUserUsername(request.getTraineeName())).thenReturn(true);
 
         List<TraineeTrainingInfoResponse> actualResponse = traineeService.getTraineeTrainingsByCriteria(request);
 
