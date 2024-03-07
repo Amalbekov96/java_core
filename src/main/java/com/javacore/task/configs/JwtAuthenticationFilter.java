@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -28,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
+        putUserToContext(request);
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -51,5 +54,41 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void putUserToContext(HttpServletRequest request) {
+        Optional.of(request)
+                .map(this::getAuthorizationHeader)
+                .map(this::extractToken)
+                .filter(this::isTokenValid)
+                .map(this::retrieveUserDetails)
+                .ifPresent(this::setAuthenticationToContext);
+    }
+
+    private boolean isTokenValid(String token) {
+        return jwtService.validateToken(token);
+    }
+
+    private void setAuthenticationToContext(UserDetails userDetails) {
+        var authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext()
+                .setAuthentication(authenticationToken);
+    }
+
+    private UserDetails retrieveUserDetails(String token) {
+        return userService.userDetailsService().loadUserByUsername(extractUsername(token));
+    }
+
+    private String extractUsername(String token) {
+        return jwtService.extractUsername(token);
+    }
+
+    private String extractToken(String header) {
+        return header.substring(7);
+    }
+
+    @Nullable
+    private String getAuthorizationHeader(HttpServletRequest request) {
+        return request.getHeader("Authorization");
     }
 }
