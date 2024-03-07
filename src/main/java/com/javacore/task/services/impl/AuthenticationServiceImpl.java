@@ -6,6 +6,7 @@ import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.UserRole;
 import com.javacore.task.exceptions.BadCredentialsException;
+import com.javacore.task.exceptions.BadRequestException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.models.request.TraineeRequest;
@@ -17,6 +18,7 @@ import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingTypeRepository;
 import com.javacore.task.repositories.UserRepository;
 import com.javacore.task.services.AuthenticationService;
+import com.javacore.task.services.BruteForceService;
 import com.javacore.task.services.JwtService;
 import com.javacore.task.services.ProfileService;
 import jakarta.persistence.EntityNotFoundException;
@@ -41,6 +43,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final ProfileService profileService;
+    private final BruteForceService bruteForceService;
 
     @Transactional
     @Override
@@ -142,9 +145,11 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public SignInResponse signIn(SignInRequest request) {
-
         if (request.getUsername().isBlank() || request.getPassword().isBlank()) {
             throw new BadCredentialsException("Username or password is blank");
+        }
+        if (bruteForceService.isBlocked(request.getUsername())) {
+            throw new BadRequestException("User is blocked for 5 min");
         }
         User user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(
                 () -> {
