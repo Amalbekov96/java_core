@@ -31,6 +31,9 @@ public class BruteForceServiceImpl implements BruteForceService {
 
     @Override
     public void loginFailed(String key) {
+        if (key == null) {
+            return;
+        }
         int attempts;
 
         try {

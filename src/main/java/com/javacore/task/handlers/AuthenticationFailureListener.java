@@ -4,6 +4,7 @@ import com.javacore.task.services.BruteForceService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
 import org.springframework.stereotype.Component;
@@ -17,8 +18,8 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
     private final HttpServletRequest request;
 
     @Override
-    public void onApplicationEvent(AuthenticationFailureBadCredentialsEvent event) {
-        String username = request.getParameter("username");
+    public void onApplicationEvent(@NotNull AuthenticationFailureBadCredentialsEvent event) {
+        String username = request.getParameter("LAST_USERNAME");
         bruteForceService.loginFailed(username);
         log.warn("Bad credentials for user {}", username);
     }
