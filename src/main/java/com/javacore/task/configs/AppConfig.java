@@ -43,9 +43,12 @@ public class AppConfig {
     public MeterRegistry registry(){
         return new CompositeMeterRegistry();
     }
+
     @Bean
-    public Counter counter(){
-        return Counter.builder("operations.called").register(registry());
+    public Counter counter(MeterRegistry registry) {
+        return Counter.builder("operations.called")
+                .description("Number of operations called")
+                .register(registry);
     }
 
     @Bean
