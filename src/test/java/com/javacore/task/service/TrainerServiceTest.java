@@ -39,6 +39,9 @@ import static org.mockito.ArgumentMatchers.eq;
     private TrainerServiceImpl trainerService;
     @Mock
     private TrainingMapper trainingMapper;
+    @Mock
+    private TrainerMapper trainerMapper;
+
     @Test
     @Transactional
     void testUpdateTrainer() {

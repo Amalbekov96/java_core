@@ -58,10 +58,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    public Counter counter() {
-        return Counter.builder("operations.called").register(registry());
+    public Counter counter(MeterRegistry registry) {
+        return Counter.builder("operations.called")
+                .description("Number of operations called")
+                .register(registry);
     }
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -69,7 +70,7 @@ public class SecurityConfig {
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/",
-                                "/api/v1/auth/sign-in",
+                                "/api/v1/auth/sign**",
                                 "v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/actuator/**")

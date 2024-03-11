@@ -19,7 +19,7 @@ public class AuthenticationFailureListener implements ApplicationListener<Authen
 
     @Override
     public void onApplicationEvent(@NotNull AuthenticationFailureBadCredentialsEvent event) {
-        String username = request.getParameter("LAST_USERNAME");
+        String username = (String) request.getAttribute("LAST_USERNAME");
         bruteForceService.loginFailed(username);
         log.warn("Bad credentials for user {}", username);
     }
