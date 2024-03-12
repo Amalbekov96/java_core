@@ -24,7 +24,12 @@ import com.javacore.task.services.ProfileService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +49,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final JwtService jwtService;
     private final ProfileService profileService;
     private final BruteForceService bruteForceService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
@@ -131,7 +137,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!auth.getName().equals(username)) {
             throw new BadCredentialsException("You can change only your password");
         }
-        User user = userRepository.findUserByUsername(username).orElseThrow(()-> {
+        User user = userRepository.findUserByUsername(username).orElseThrow(() -> {
             log.warn("Response: User not found");
             return new UserNotFoundException(String.format("User with username: %s not found", username));
         });
@@ -160,15 +166,32 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             log.warn("Response: Wrong password");
-                throw new BadCredentialsException("wrong credentials");
-            }
+            publishBadCredentialsEvent(request.getUsername(), (request.getPassword()));
+            throw new BadCredentialsException("wrong credentials");
+        }
 
-     log.info("User signed in with username: {}", user.getUsername());
+        log.info("User signed in with username: {}", user.getUsername());
         String jwtToken = jwtService.generateToken(user);
+        publishSuccessEvent(request.getUsername(), request.getPassword());
         return SignInResponse.builder().
                 token(jwtToken)
                 .username(user.getUsername())
                 .role(user.getRole())
                 .build();
+    }
+
+
+    private void publishBadCredentialsEvent(String username, String password) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        AuthenticationException exception = new AuthenticationException("Bad credentials") {
+        };
+        AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(authentication, exception);
+        eventPublisher.publishEvent(event);
+    }
+
+    private void publishSuccessEvent(String username, String password) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication);
+        eventPublisher.publishEvent(event);
     }
 }

@@ -15,11 +15,10 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthenticationFailureListener implements ApplicationListener<AuthenticationFailureBadCredentialsEvent> {
     private final BruteForceService bruteForceService;
-    private final HttpServletRequest request;
 
     @Override
     public void onApplicationEvent(@NotNull AuthenticationFailureBadCredentialsEvent event) {
-        String username = (String) request.getAttribute("LAST_USERNAME");
+        String username = event.getAuthentication().getName();
         bruteForceService.loginFailed(username);
         log.warn("Bad credentials for user {}", username);
     }

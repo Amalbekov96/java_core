@@ -55,6 +55,15 @@ public class AuthenticationController {
         counter.increment();
         return authenticationService.signIn(request);
     }
+
+    @Operation(summary = "Sign In")
+    @PostMapping("/sign-in2")
+    public SignInResponse signIn(@RequestParam String username, @RequestParam String password){
+        log.info("Endpoint called: POST /api/v1/auth/sign-in");
+        counter.increment();
+        SignInRequest request = new SignInRequest(username, password);
+        return authenticationService.signIn(request);
+    }
     @Operation(summary = "Update Password")
     @PutMapping
     @PreAuthorize("hasAnyAuthority('TRAINER', 'TRAINEE')")
