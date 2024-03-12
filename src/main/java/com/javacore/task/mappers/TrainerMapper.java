@@ -4,15 +4,15 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.InactiveUserException;
-import com.javacore.task.models.*;
+import com.javacore.task.models.TrainerModel;
+import com.javacore.task.models.TrainingTypeModel;
+import com.javacore.task.models.UserModel;
 import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TraineesListResponse;
 import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

@@ -1,7 +1,6 @@
-package com.javacore.task.handlers;
+package com.javacore.task.listeners;
 
 import com.javacore.task.services.BruteForceService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
     private final BruteForceService bruteForceService;
-    private final HttpServletRequest request;
 
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {

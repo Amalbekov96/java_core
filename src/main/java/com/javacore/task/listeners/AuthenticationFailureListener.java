@@ -1,7 +1,6 @@
-package com.javacore.task.handlers;
+package com.javacore.task.listeners;
 
 import com.javacore.task.services.BruteForceService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;

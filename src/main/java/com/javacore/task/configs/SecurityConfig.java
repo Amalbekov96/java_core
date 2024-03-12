@@ -1,8 +1,5 @@
 package com.javacore.task.configs;
 
-import com.javacore.task.handlers.AuthenticationFailureHandler;
-import com.javacore.task.handlers.AuthenticationSuccessHandler;
-import com.javacore.task.handlers.CustomAccessDeniedHandler;
 import com.javacore.task.services.UserService;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.Counter;
@@ -38,9 +35,6 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
     private final CorsConfigurationSource corsConfigurationSource;
-    private final AuthenticationFailureHandler authenticationFailureHandler;
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
-    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -63,11 +57,11 @@ public class SecurityConfig {
                 .description("Number of operations called")
                 .register(registry);
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/",
                                 "/api/v1/auth/sign**",
@@ -77,8 +71,8 @@ public class SecurityConfig {
                         .permitAll().anyRequest().authenticated())
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception.accessDeniedHandler(customAccessDeniedHandler)
-                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
 
         return http.build();
     }

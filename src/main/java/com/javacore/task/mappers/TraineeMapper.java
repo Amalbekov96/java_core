@@ -6,15 +6,14 @@ import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.InactiveUserException;
 import com.javacore.task.models.TraineeModel;
 import com.javacore.task.models.UserModel;
-import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.response.TrainersListResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
