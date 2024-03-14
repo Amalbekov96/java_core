@@ -73,4 +73,17 @@ public class AuthenticationController {
         return new ResponseEntity<>("password successfully updated!", HttpStatus.OK);
     }
 
+    @Operation(summary = "Sign Out")
+    @PostMapping("/sign-out")
+    public ResponseEntity<String> signOut(HttpServletRequest request, HttpServletResponse response) {
+        log.info("Endpoint called: POST /api/v1/auth/sign-out");
+        counter.increment();
+        try {
+            request.logout();
+            return new ResponseEntity<>("You have been logged out successfully.", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Logout failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }
