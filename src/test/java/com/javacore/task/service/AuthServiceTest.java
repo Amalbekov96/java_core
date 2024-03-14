@@ -14,6 +14,7 @@ import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingTypeRepository;
 import com.javacore.task.repositories.UserRepository;
+import com.javacore.task.services.EncryptionService;
 import com.javacore.task.services.JwtService;
 import com.javacore.task.services.impl.AuthenticationServiceImpl;
 import com.javacore.task.services.impl.ProfileServiceImpl;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Date;
@@ -42,7 +42,7 @@ class AuthServiceTest {
     @Mock
     private TrainerRepository trainerRepository;
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private EncryptionService encryptionService;
     @Mock
     private JwtService jwtService;
     @Mock
@@ -118,7 +118,7 @@ class AuthServiceTest {
         user.setRole(UserRole.TRAINEE);
         user.setUsername("username");
         when(userRepository.findUserByUsername(any())).thenReturn(Optional.of(user));
-        when(passwordEncoder.matches(any(), any())).thenReturn(true);
+        when(encryptionService.matches(any(), any())).thenReturn(true);
         when(jwtService.generateToken(any())).thenReturn("token");
 
 

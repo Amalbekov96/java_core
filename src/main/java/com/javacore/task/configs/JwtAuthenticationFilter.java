@@ -1,6 +1,7 @@
 package com.javacore.task.configs;
 
 import com.javacore.task.services.JwtService;
+import com.javacore.task.services.TokenBlacklistService;
 import com.javacore.task.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -28,6 +29,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserService userService;
+    private final TokenBlacklistService tokenBlacklistService;
+
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
@@ -77,7 +80,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private boolean isTokenValid(String token, UserDetails userDetails) {
-        return jwtService.isTokenValid(token, userDetails);
+        return jwtService.isTokenValid(token, userDetails) && !tokenBlacklistService.isTokenBlacklisted(token);
     }
 
     private void setAuthenticationToContext(UserDetails userDetails, HttpServletRequest request) {

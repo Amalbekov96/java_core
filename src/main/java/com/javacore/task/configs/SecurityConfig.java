@@ -1,5 +1,6 @@
 package com.javacore.task.configs;
 
+import com.javacore.task.handlers.CustomLogoutSuccessHandler;
 import com.javacore.task.services.UserService;
 import io.micrometer.core.aop.TimedAspect;
 import io.micrometer.core.instrument.Counter;
@@ -35,6 +36,7 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final UserService userService;
     private final CorsConfigurationSource corsConfigurationSource;
+    private final CustomLogoutSuccessHandler customLogoutSuccessHandler;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -64,7 +66,7 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request.requestMatchers("/",
-                                "/api/v1/auth/sign**",
+                                "/api/v1/auth/**",
                                 "v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/actuator/**")
@@ -72,7 +74,11 @@ public class SecurityConfig {
                 .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)));
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .logout(logout -> logout
+                        .logoutUrl("/api/v1/auth/sign-out")
+                        .logoutSuccessHandler(customLogoutSuccessHandler)
+                        .permitAll());
 
         return http.build();
     }

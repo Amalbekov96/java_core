@@ -17,10 +17,7 @@ import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingTypeRepository;
 import com.javacore.task.repositories.UserRepository;
-import com.javacore.task.services.AuthenticationService;
-import com.javacore.task.services.BruteForceService;
-import com.javacore.task.services.JwtService;
-import com.javacore.task.services.ProfileService;
+import com.javacore.task.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +28,6 @@ import org.springframework.security.authentication.event.AuthenticationSuccessEv
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,7 +41,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TrainingTypeRepository trainingTypeRepository;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final EncryptionService encryptionService;
     private final JwtService jwtService;
     private final ProfileService profileService;
     private final BruteForceService bruteForceService;
@@ -64,7 +60,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastName(request.getLastName())
                 .username(username)
                 .role(UserRole.TRAINEE)
-                .password(passwordEncoder.encode(password))
+                .password(encryptionService.encode(password))
                 .isActive(true)
                 .build();
         log.info("User created: {}", user);
@@ -101,7 +97,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .username(username)
                 .role(UserRole.TRAINER)
                 .isActive(true)
-                .password(passwordEncoder.encode(password))
+                .password(encryptionService.encode(password))
                 .build();
         userRepository.save(user);
 
@@ -141,10 +137,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             log.warn("Response: User not found");
             return new UserNotFoundException(String.format("User with username: %s not found", username));
         });
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!encryptionService.matches(password, user.getPassword())) {
             throw new com.javacore.task.exceptions.BadCredentialsException("wrong password");
         }
-        userRepository.changePassword(user.getUserId(), passwordEncoder.encode(newPassword));
+        userRepository.changePassword(user.getUserId(), encryptionService.encode(newPassword));
         log.info("Changed password for User");
     }
 
@@ -164,7 +160,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 }
         );
 
-        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!encryptionService.matches(request.getPassword(), user.getPassword())) {
             log.warn("Response: Wrong password");
             publishBadCredentialsEvent(request.getUsername(), (request.getPassword()));
             throw new BadCredentialsException("wrong credentials");
