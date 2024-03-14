@@ -14,8 +14,8 @@ public class UpdatePasswordRequestBodyResolver implements RequestBodyResolver {
         return """
             {
                 "username": "John.Doe",
-                "password": "123",
-                "newPassword": "123"
+                "password": "Ajj9FlJhX6",
+                "newPassword": "Ajj9FlJhX6"
             }
             """;
     }

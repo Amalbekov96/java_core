@@ -14,7 +14,7 @@ public class SignInRequestBodyResolver implements RequestBodyResolver {
         return """
                     {
                         "username": "Kushtar.Amalbekov",
-                        "password": "ziJ4jlTA22"
+                        "password": "Ajj9FlJhX6"
                     }
                     """;
     }

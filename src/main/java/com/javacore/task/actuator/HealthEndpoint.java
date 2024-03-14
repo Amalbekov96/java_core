@@ -136,7 +136,7 @@ public class HealthEndpoint implements HealthIndicator {
     }
     public SignInResponse obtainAuthToken() {
         try {
-            String signInRequestBody = "{\"username\": \"" + "John.Doe" + "\", \"password\": \"" + "123" + "\"}";
+            String signInRequestBody = "{\"username\": \"" + "John.Doe" + "\", \"password\": \"" + "Ajj9FlJhX6" + "\"}";
             URI signInUri = URI.create(BASE_URL + ENDPOINT_SIGN_IN);
             HttpHeaders signInHeaders = new HttpHeaders();
             signInHeaders.setContentType(MediaType.APPLICATION_JSON);
