@@ -3,6 +3,7 @@ package com.javacore.task.controllers;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.enums.TrainingTypes;
 import com.javacore.task.services.TrainingTypeService;
+import io.micrometer.core.instrument.Counter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -21,6 +22,9 @@ class TrainingTypeControllerTest {
 
     @InjectMocks
     private TrainingTypesRestController trainingTypeController;
+
+    @Mock
+    private Counter counter;
 
     @BeforeEach
     void setUp() {

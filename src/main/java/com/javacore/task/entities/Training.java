@@ -41,4 +41,15 @@ public class Training {
 
     @Column(name = "TRAINING_DURATION", nullable = false)
     private Number trainingDuration;
+
+    @Override
+    public String toString() {
+        return "Training{" +
+                "id=" + id +
+                ", trainingType=" + trainingType +
+                ", trainingName='" + trainingName + '\'' +
+                ", trainingDate=" + trainingDate +
+                ", trainingDuration=" + trainingDuration +
+                '}';
+    }
 }

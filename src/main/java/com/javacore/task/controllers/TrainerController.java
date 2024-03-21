@@ -7,6 +7,8 @@ import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
 import com.javacore.task.services.TrainerService;
+import io.micrometer.core.annotation.Timed;
+import io.micrometer.core.instrument.Counter;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Slf4j
+@Timed
 @RestController
 @PreAuthorize("hasAuthority('TRAINER')")
 @RequestMapping("/trainers")
@@ -30,6 +33,7 @@ import java.util.List;
 public class TrainerController {
 
     private final TrainerService trainerService;
+    private final Counter counter;
 
     @Operation(summary = "Get Trainer by ID")
     @ApiResponses(value = {
@@ -41,6 +45,7 @@ public class TrainerController {
         log.info("Endpoint called: GET /trainers/{}", trainerId);
         TrainerModel trainerModel = trainerService.getTrainerById(trainerId);
         log.info("Response: {}", trainerModel);
+        counter.increment();
         return ResponseEntity.ok(trainerModel);
     }
 
@@ -54,6 +59,7 @@ public class TrainerController {
         log.info("Endpoint called: PUT /trainers Request: {}", request);
         TrainerUpdateResponse updatedTrainer = trainerService.updateTrainer(request);
         log.info("Response: {}", updatedTrainer);
+        counter.increment();
         return ResponseEntity.ok(updatedTrainer);
     }
 
@@ -63,10 +69,14 @@ public class TrainerController {
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
     @GetMapping
-    public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("q") String username) {
+    public ResponseEntity<TrainerInfoResponse> getTrainerProfileByName(@RequestParam("trainerUsername") String username) {
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("Trainer username cannot be null or empty");
+        }
         log.info("Endpoint called: GET /trainer?q={}", username);
         TrainerInfoResponse response = trainerService.findTrainerProfileByUsername(username);
         log.info("Response: {}", response);
+        counter.increment();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -77,10 +87,14 @@ public class TrainerController {
             @ApiResponse(responseCode = "409", description = "Trainer is already in desired state")
     })
     @PatchMapping
-    public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") boolean status) {
+    public ResponseEntity<String> updateTrainerStatus(@RequestParam String username, @RequestParam("status") Boolean status) {
+        if ((username == null || username.trim().isEmpty()) || status == null) {
+            throw new IllegalArgumentException("Trainer username or status cannot be null or empty");
+        }
         log.info("Endpoint called: PATCH /trainer?{}&choice={}", username, status);
         String result = trainerService.updateTrainerStatus(status, username);
         log.info("Response: {}", result);
+        counter.increment();
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 
@@ -89,11 +103,12 @@ public class TrainerController {
             @ApiResponse(responseCode = "200", description = "Successfully retrieved Trainer trainings"),
             @ApiResponse(responseCode = "404", description = "Trainer not found")
     })
-    @GetMapping("/trainer-trainings")
+    @PostMapping("/trainings")
     public ResponseEntity<List<TrainerTrainingInfoResponse>> getTrainerTrainingsList(@Valid @RequestBody TrainerTrainingsRequest request) {
         log.info("Endpoint called: GET /trainer-trainings, Request: {}", request);
         List<TrainerTrainingInfoResponse> responses = trainerService.getTrainerTrainingsByCriteria(request);
         log.info("Response: {}", responses);
+        counter.increment();
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
 

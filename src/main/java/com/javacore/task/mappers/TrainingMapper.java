@@ -1,15 +1,13 @@
 package com.javacore.task.mappers;
 
 import com.javacore.task.entities.Training;
-import com.javacore.task.models.*;
+import com.javacore.task.models.TrainingModel;
 import com.javacore.task.models.response.TraineeTrainingInfoResponse;
 import com.javacore.task.models.response.TrainerTrainingInfoResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +33,7 @@ public class TrainingMapper {
     public List<TraineeTrainingInfoResponse> mapTraineeTrainingsToDto(List<Training> trainings) {
         return trainings.stream()
                 .map(this::mapTraineeTrainingToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
     private TraineeTrainingInfoResponse mapTraineeTrainingToDto(Training training) {
         return new TraineeTrainingInfoResponse(
@@ -48,7 +46,7 @@ public class TrainingMapper {
     public List<TrainerTrainingInfoResponse> mapTrainerTrainingsToDto(List<Training> trainings) {
         return trainings.stream()
                 .map(this::mapTrainerTrainingToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
     private TrainerTrainingInfoResponse mapTrainerTrainingToDto(Training training) {
         return new TrainerTrainingInfoResponse(

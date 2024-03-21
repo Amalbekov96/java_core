@@ -13,7 +13,7 @@ public class ProfileServiceImpl implements ProfileService {
 
     private final UserRepository userRepository;
     private static final Random RANDOM = new Random();
-    private static final int PASSWORD_LENGTH = 10;
+    public static final int PASSWORD_LENGTH = 10;
     @Override
     public String generateUsername(String firstName, String lastName) {
         String baseUsername = firstName + "." + lastName;

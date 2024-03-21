@@ -3,20 +3,30 @@ package com.javacore.task.models.request;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.Date;
 
-public record TraineeUpdateRequest(
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class TraineeUpdateRequest {
         @NotBlank(message = "User name cannot be blank")
-        String userName,
+        private String userName;
+
         @NotBlank(message = "First name cannot be blank")
-        String firstName,
+        private String firstName;
+
         @NotBlank(message = "Last name cannot be blank")
-        String lastName,
+        private String lastName;
+
         @JsonFormat(pattern = "yyyy-MM-dd")
-        Date dateOfBirth,
-        String address,
+        private Date dateOfBirth;
+
+        private String address;
+
         @NotNull(message = "Active status cannot be null")
-        Boolean isActive
-) {
+        private Boolean isActive;
 }

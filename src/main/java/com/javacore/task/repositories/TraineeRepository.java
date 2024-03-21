@@ -13,11 +13,14 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+
 @Repository
-public interface TraineeRepository extends JpaRepository<Trainee,Long>  {
+public interface TraineeRepository extends JpaRepository<Trainee, Long> {
     boolean existsByUserUsername(String username);
+
     @Query("select t from Trainee t where t.user.username = ?1")
     Optional<Trainee> findTraineeByUserUsername(String username);
+
     @Modifying
     @Query(nativeQuery = true, value = "UPDATE users SET is_active = true WHERE users.user_id IN (SELECT t.user_id FROM trainee t WHERE t.trainee_id = ?1)")
     void activateTrainee(long id);

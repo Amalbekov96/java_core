@@ -6,23 +6,20 @@ import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.InactiveUserException;
 import com.javacore.task.models.TraineeModel;
 import com.javacore.task.models.UserModel;
-import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.request.TraineeUpdateRequest;
 import com.javacore.task.models.response.TraineeInfoResponse;
+import com.javacore.task.models.response.TraineeProfileUpdateResponse;
 import com.javacore.task.models.response.TrainersListResponse;
-import com.javacore.task.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
 public class TraineeMapper {
 
     private final UserMapper userMapper;
-    private final UserRepository userRepository;
 
     public TraineeModel traineeToTraineeModel(Trainee trainee) {
         TraineeModel traineeModel = new TraineeModel();
@@ -56,11 +53,11 @@ public class TraineeMapper {
 
     public Trainee update(TraineeUpdateRequest request, Trainee trainee) {
         if (request != null && trainee != null) {
-            trainee.setAddress(request.address());
-            trainee.setDateOfBirth(request.dateOfBirth());
-            trainee.getUser().setFirstName(request.firstName());
-            trainee.getUser().setLastName(request.lastName());
-            Boolean isActive = request.isActive();
+            trainee.setAddress(request.getAddress());
+            trainee.setDateOfBirth(request.getDateOfBirth());
+            trainee.getUser().setFirstName(request.getFirstName());
+            trainee.getUser().setLastName(request.getLastName());
+            Boolean isActive = request.getIsActive();
             if (isActive == null) {
                 throw new InactiveUserException("Active status cannot be null");
             } else {
@@ -72,8 +69,7 @@ public class TraineeMapper {
 
     public List<TrainersListResponse> mapTraineesTrainersToDto(List<Trainer> trainers) {
         return trainers.stream()
-                .map(this::mapTrainerToDto)
-                .collect(Collectors.toList());
+                .map(this::mapTrainerToDto).toList();
     }
 
     private TrainersListResponse mapTrainerToDto(Trainer trainer) {
@@ -97,8 +93,7 @@ public class TraineeMapper {
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingType().name()
-                        ))
-                        .collect(Collectors.toList()));
+                        )).toList());
     }
 
     public TraineeProfileUpdateResponse traineeToTraineeResponse(Trainee existingTrainee) {
@@ -115,8 +110,7 @@ public class TraineeMapper {
                                 trainer.getUser().getFirstName(),
                                 trainer.getUser().getLastName(),
                                 trainer.getSpecialization().getTrainingType().name()
-                        ))
-                        .collect(Collectors.toList())
+                        )).toList()
         );
     }
 }

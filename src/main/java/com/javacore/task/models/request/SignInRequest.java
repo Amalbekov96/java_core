@@ -1,12 +1,17 @@
 package com.javacore.task.models.request;
 
-import lombok.Builder;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class SignInRequest {
 
-@Builder
-public record SignInRequest (
-     String username,
-     String password
-){
-
+    @NotBlank(message = "Username cannot be null or empty")
+    private String username;
+    @NotBlank(message = "Password cannot be null or empty")
+    private String password;
 }

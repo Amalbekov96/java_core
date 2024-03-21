@@ -4,15 +4,15 @@ import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.exceptions.InactiveUserException;
-import com.javacore.task.models.*;
+import com.javacore.task.models.TrainerModel;
+import com.javacore.task.models.TrainingTypeModel;
+import com.javacore.task.models.UserModel;
 import com.javacore.task.models.request.TrainerUpdateRequest;
 import com.javacore.task.models.response.TraineesListResponse;
 import com.javacore.task.models.response.TrainerInfoResponse;
 import com.javacore.task.models.response.TrainerUpdateResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -57,14 +57,14 @@ public class TrainerMapper {
 
     public Trainer update(TrainerUpdateRequest request, Trainer trainer) {
         if (request != null && trainer != null) {
-            trainer.getUser().setUsername(request.userName());
-            trainer.getUser().setFirstName(request.firstName());
-            trainer.getUser().setLastName(request.lastName());
-            Boolean isActive = request.isActive();
+            trainer.getUser().setUsername(request.getUserName());
+            trainer.getUser().setFirstName(request.getFirstName());
+            trainer.getUser().setLastName(request.getLastName());
+            Boolean isActive = request.getIsActive();
             if (isActive == null) {
                 throw new InactiveUserException("Active status cannot be null");
             } else {
-                trainer.getUser().setIsActive(request.isActive());
+                trainer.getUser().setIsActive(request.getIsActive());
             }
 
         }
@@ -81,7 +81,7 @@ public class TrainerMapper {
                         trainee.getUser().getUsername(),
                         trainee.getUser().getFirstName(),
                         trainee.getUser().getLastName()
-                )).collect(Collectors.toList()));
+                )).toList());
     }
     public TrainerUpdateResponse trainerToTrainerUpdateResponse(Trainer trainer) {
         return TrainerUpdateResponse.builder()
@@ -95,7 +95,7 @@ public class TrainerMapper {
                                 trainee.getUser().getUsername(),
                                 trainee.getUser().getFirstName(),
                                 trainee.getUser().getLastName()
-                )).collect(Collectors.toList()))
+                )).toList())
                 .build();
 
     }

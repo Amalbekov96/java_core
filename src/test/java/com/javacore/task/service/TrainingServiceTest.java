@@ -3,6 +3,7 @@ package com.javacore.task.service;
 import com.javacore.task.entities.Trainee;
 import com.javacore.task.entities.Trainer;
 import com.javacore.task.entities.Training;
+import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.models.request.TrainingRequest;
 import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
@@ -17,12 +18,14 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Date;
 import java.util.Optional;
 
+import static org.junit.Assert.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
-public class TrainingServiceTest {
+class TrainingServiceTest {
 
     @Mock
     private TrainingRepository trainingDao;
@@ -37,7 +40,7 @@ public class TrainingServiceTest {
     private TrainingServiceImpl trainingService;
 
     @Test
-    void testAddTraining(){
+    void testAddTraining() {
         TrainingRequest trainingRequest = new TrainingRequest(
                 "Kanysh.Abdyrakmanova1",
                 "Aiperi.Adylova",
@@ -56,6 +59,36 @@ public class TrainingServiceTest {
         verify(trainerRepository, times(1)).findByUserUsername("Aiperi.Adylova");
         verify(trainingDao, times(1)).save(any(Training.class));
 
+    }
+
+    @Test
+    void testSaveTraining_TraineeNotFound() {
+        TrainingRequest trainingRequest = new TrainingRequest(
+                "NonexistentTrainee",
+                "Aiperi.Adylova",
+                "Weight_Lifting",
+                new Date(),
+                60
+        );
+        when(traineeDao.findTraineeByUserUsername("NonexistentTrainee")).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainingService.saveTraining(trainingRequest));
+    }
+
+    @Test
+    void testSaveTraining_TrainerNotFound() {
+        TrainingRequest trainingRequest = new TrainingRequest(
+                "Kanysh.Abdyrakmanova1",
+                "NonexistentTrainer",
+                "Weight_Lifting",
+                new Date(),
+                60
+        );
+        Trainee trainee = new Trainee();
+        when(traineeDao.findTraineeByUserUsername("Kanysh.Abdyrakmanova1")).thenReturn(Optional.of(trainee));
+        when(trainerRepository.findByUserUsername("NonexistentTrainer")).thenReturn(Optional.empty());
+
+        assertThrows(UserNotFoundException.class, () -> trainingService.saveTraining(trainingRequest));
     }
 
 }

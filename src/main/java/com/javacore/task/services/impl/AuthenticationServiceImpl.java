@@ -6,6 +6,7 @@ import com.javacore.task.entities.TrainingType;
 import com.javacore.task.entities.User;
 import com.javacore.task.enums.UserRole;
 import com.javacore.task.exceptions.BadCredentialsException;
+import com.javacore.task.exceptions.BadRequestException;
 import com.javacore.task.exceptions.UserNotFoundException;
 import com.javacore.task.models.request.SignInRequest;
 import com.javacore.task.models.request.TraineeRequest;
@@ -16,15 +17,17 @@ import com.javacore.task.repositories.TraineeRepository;
 import com.javacore.task.repositories.TrainerRepository;
 import com.javacore.task.repositories.TrainingTypeRepository;
 import com.javacore.task.repositories.UserRepository;
-import com.javacore.task.services.AuthenticationService;
-import com.javacore.task.services.JwtService;
-import com.javacore.task.services.ProfileService;
+import com.javacore.task.services.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationFailureBadCredentialsEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,32 +41,34 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     private final TrainingTypeRepository trainingTypeRepository;
     private final TraineeRepository traineeRepository;
     private final TrainerRepository trainerRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final EncryptionService encryptionService;
     private final JwtService jwtService;
     private final ProfileService profileService;
+    private final BruteForceService bruteForceService;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
     @Override
     public SignUpResponse traineeSignUp(TraineeRequest request) {
         log.info("Trainee sign up request: {}", request);
-        String username = profileService.generateUsername(request.firstName(), request.lastName());
+        String username = profileService.generateUsername(request.getFirstName(), request.getLastName());
         log.info("Username generated: {}", username);
         String password = profileService.generateRandomPassword();
         log.info("Password generated: {}", password);
         User user = User.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .username(username)
                 .role(UserRole.TRAINEE)
-                .password(passwordEncoder.encode(password))
+                .password(encryptionService.encode(password))
                 .isActive(true)
                 .build();
         log.info("User created: {}", user);
         userRepository.save(user);
 
         Trainee trainee = Trainee.builder()
-                .address(request.address())
-                .dateOfBirth(request.dateOfBirth())
+                .address(request.getAddress())
+                .dateOfBirth(request.getDateOfBirth())
                 .user(user)
                 .build();
         log.info("Trainee created: {}", trainee);
@@ -84,19 +89,19 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public SignUpResponse trainerSignUp(TrainerRequest request) {
 
-        String username = profileService.generateUsername(request.firstName(), request.lastName());
+        String username = profileService.generateUsername(request.getFirstName(), request.getLastName());
         String password = profileService.generateRandomPassword();
         User user = User.builder()
-                .firstName(request.firstName())
-                .lastName(request.lastName())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
                 .username(username)
                 .role(UserRole.TRAINER)
                 .isActive(true)
-                .password(passwordEncoder.encode(password))
+                .password(encryptionService.encode(password))
                 .build();
         userRepository.save(user);
 
-        TrainingType trainingType = trainingTypeRepository.findById(request.specialization().getId()).orElseThrow(
+        TrainingType trainingType = trainingTypeRepository.findById(request.getSpecialization().getId()).orElseThrow(
                 () -> {
                     log.warn("Response: Training type not found");
                     return new EntityNotFoundException("Training type not found");
@@ -128,42 +133,61 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!auth.getName().equals(username)) {
             throw new BadCredentialsException("You can change only your password");
         }
-        User user = userRepository.findUserByUsername(username).orElseThrow(()-> {
+        User user = userRepository.findUserByUsername(username).orElseThrow(() -> {
             log.warn("Response: User not found");
             return new UserNotFoundException(String.format("User with username: %s not found", username));
         });
-        if (!passwordEncoder.matches(password, user.getPassword())) {
+        if (!encryptionService.matches(password, user.getPassword())) {
             throw new com.javacore.task.exceptions.BadCredentialsException("wrong password");
         }
-        userRepository.changePassword(user.getUserId(), passwordEncoder.encode(newPassword));
+        userRepository.changePassword(user.getUserId(), encryptionService.encode(newPassword));
         log.info("Changed password for User");
     }
 
 
     @Override
     public SignInResponse signIn(SignInRequest request) {
-
-        if (request.username().isBlank() || request.password().isBlank()) {
+        if (request.getUsername().isBlank() || request.getPassword().isBlank()) {
             throw new BadCredentialsException("Username or password is blank");
         }
-        User user = userRepository.findUserByUsername(request.username()).orElseThrow(
+        if (bruteForceService.isBlocked(request.getUsername())) {
+            throw new BadRequestException("User is blocked for 5 min");
+        }
+        User user = userRepository.findUserByUsername(request.getUsername()).orElseThrow(
                 () -> {
                     log.warn("Response: User not found");
                     return new EntityNotFoundException("User not found");
                 }
         );
 
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+        if (!encryptionService.matches(request.getPassword(), user.getPassword())) {
             log.warn("Response: Wrong password");
-                throw new BadCredentialsException("wrong credentials");
-            }
+            publishBadCredentialsEvent(request.getUsername(), (request.getPassword()));
+            throw new BadCredentialsException("wrong credentials");
+        }
 
-     log.info("User signed in with username: {}", user.getUsername());
+        log.info("User signed in with username: {}", user.getUsername());
         String jwtToken = jwtService.generateToken(user);
+        publishSuccessEvent(request.getUsername(), request.getPassword());
         return SignInResponse.builder().
                 token(jwtToken)
                 .username(user.getUsername())
                 .role(user.getRole())
                 .build();
+    }
+
+
+    private void publishBadCredentialsEvent(String username, String password) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        AuthenticationException exception = new AuthenticationException("Bad credentials") {
+        };
+        AuthenticationFailureBadCredentialsEvent event = new AuthenticationFailureBadCredentialsEvent(authentication, exception);
+        eventPublisher.publishEvent(event);
+    }
+
+    private void publishSuccessEvent(String username, String password) {
+        Authentication authentication = new UsernamePasswordAuthenticationToken(username, password);
+        AuthenticationSuccessEvent event = new AuthenticationSuccessEvent(authentication);
+        eventPublisher.publishEvent(event);
     }
 }
