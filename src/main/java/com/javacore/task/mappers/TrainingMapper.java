@@ -35,7 +35,7 @@ public class TrainingMapper {
                 .map(this::mapTraineeTrainingToDto)
                 .toList();
     }
-    private TraineeTrainingInfoResponse mapTraineeTrainingToDto(Training training) {
+    public TraineeTrainingInfoResponse mapTraineeTrainingToDto(Training training) {
         return new TraineeTrainingInfoResponse(
                 training.getTrainingName(),
                 training.getTrainingDate(),
@@ -48,7 +48,7 @@ public class TrainingMapper {
                 .map(this::mapTrainerTrainingToDto)
                 .toList();
     }
-    private TrainerTrainingInfoResponse mapTrainerTrainingToDto(Training training) {
+    public TrainerTrainingInfoResponse mapTrainerTrainingToDto(Training training) {
         return new TrainerTrainingInfoResponse(
                 training.getTrainingName(),
                 training.getTrainingDate(),
@@ -57,6 +57,4 @@ public class TrainingMapper {
                 training.getTrainer().getUser().getUsername()
         );
     }
-
-
 }
