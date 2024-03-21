@@ -16,6 +16,6 @@ public class CreateWorkHourCalculatorModel {
     private String trainerLastName;
     private Boolean isActive;
     private Date trainingDate;
-    private Long trainingDuration;
+    private Number trainingDuration;
     private WorkHourCalculateType actionType;
 }

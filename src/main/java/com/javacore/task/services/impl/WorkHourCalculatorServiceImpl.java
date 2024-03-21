@@ -40,10 +40,10 @@ public class WorkHourCalculatorServiceImpl implements WorkHourCalculatorService 
 
     private CreateWorkHourCalculatorModel toCreateWorkloadModel(Training training, WorkHourCalculateType workHourCalculateType) {
         return CreateWorkHourCalculatorModel.builder()
-                .trainerUsername(training.getTrainer().getUsername())
-                .trainerFirstName(training.getTrainer().getFirstName())
-                .trainerLastName(training.getTrainer().getLastName())
-                .isActive(training.getTrainer().getActive())
+                .trainerUsername(training.getTrainer().getUser().getUsername())
+                .trainerFirstName(training.getTrainer().getUser().getFirstName())
+                .trainerLastName(training.getTrainer().getUser().getLastName())
+                .isActive(training.getTrainer().getUser().getIsActive())
                 .trainingDate(training.getTrainingDate())
                 .trainingDuration(training.getTrainingDuration())
                 .actionType(workHourCalculateType)
