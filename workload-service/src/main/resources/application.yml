@@ -1,0 +1,33 @@
+server:
+  port: 2026
+
+spring:
+  application:
+    name: trainer-workload
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: admin
+      username: admin
+      password: pass
+  activemq:
+    broker-url: tcp://localhost:61616
+    user: admin
+    password: admin
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{correlationId}] - %msg%n"
+
+management:
+  health:
+    circuitbreakers:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

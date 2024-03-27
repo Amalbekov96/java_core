@@ -1,0 +1,18 @@
+spring:
+  application:
+    name: api-gateway
+  main:
+    web-application-type: reactive
+
+logging:
+  level:
+      org.springframework.cloud.gateway: DEBUG
+      io.netty.resolver.dns.macos: DEBUG
+
+server:
+  port: 8082
+
+security:
+  secret-key: $2a$12$2QfVXqtOcq798SUf0iQrQOirEaL1T3irVNJFn1c3tq0WzMbsWvtqC
+
+
