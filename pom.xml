@@ -13,6 +13,9 @@
     <version>0.0.1-SNAPSHOT</version>
     <name>task</name>
     <description>Demo project for Spring Boot</description>
+    <modules>
+        <module>config-server</module>
+    </modules>
     <packaging>pom</packaging>
 
     <properties>
