@@ -10,6 +10,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <groupId>com.javacore</groupId>
     <artifactId>config-server</artifactId>
     <name>config-server</name>
     <description>config-server</description>
