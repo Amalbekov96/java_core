@@ -4,6 +4,7 @@ import com.javacore.task.models.request.TrainingRequest;
 import com.javacore.task.services.TrainingService;
 import io.micrometer.core.instrument.Counter;
 import jakarta.transaction.Transactional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
