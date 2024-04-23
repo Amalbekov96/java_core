@@ -64,11 +64,15 @@ services:
       ME_CONFIG_MONGODB_ENABLE_ADMIN: 'true'
 
   activemq:
-    image: rmohr/activemq
+    image: apache/activemq-artemis
     container_name: 2aa863856977
     platform: linux/amd64
     ports:
       - "61616:61616"
+      - "8161:8161"
+    environment:
+      ACTIVEMQ_ADMIN_LOGIN: "admin"
+      ACTIVEMQ_ADMIN_PASSWORD: "admin"
 
   eureka-server:
     image: eureka-server
